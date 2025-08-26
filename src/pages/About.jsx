@@ -86,15 +86,15 @@ function MentorSection() {
               
               {/* Mentor Info */}
               <div className="text-center md:text-left flex-1">
-                <h3 className="text-2xl font-bold text-white mb-2">Dr. Alexander Chen</h3>
-                <p className="text-lg text-[#49E3FF] mb-3">Head of Mathematics Department</p>
+                <h3 className="text-2xl font-bold text-white mb-2">Mrs. Manisha Deshpande</h3>
+                <p className="text-lg text-[#49E3FF] mb-3">Head of Mathematics Department (FE)</p>
                 <p className="text-[#AEAEAE] mb-4">
-                  Ph.D. in Applied Mathematics, Stanford University<br/>
-                  Specializes in Number Theory and Mathematical Modeling
+                  M.Sc. in Mathematics, University of Mumbai<br/>
+                  Specializes in calculus and matrices
                 </p>
                 <p className="text-[#AEAEAE] mb-4">
-                  📧 alexander.chen@university.edu<br/>
-                  📱 +1 (555) 987-6543
+                  📧 manisha.deshpande@pccoer.in<br/>
+                  📱 +91 9823000000
                 </p>
                 
                 {/* Inspiring Message */}
@@ -158,7 +158,7 @@ function CoreTeamSection() {
     <section className="py-20 bg-[#191D2A]">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <h2 className="text-4xl md:text-5xl font-bold text-white text-center mb-16 animate-on-scroll" data-delay="100">
-          Core Team
+           Team Members
         </h2>
         
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
@@ -177,7 +177,7 @@ function CoreTeamSection() {
                 {/* Member Info */}
                 <div className="text-center">
                   <h3 className="text-xl font-bold text-white mb-2">{member.name}</h3>
-                  <p className="text-lg text-[#49E3FF] mb-3">{member.role}</p>
+                  {/* <p className="text-lg text-[#49E3FF] mb-3">{member.role}</p> */}
                   <p className="text-sm text-[#AEAEAE] italic">{member.tagline}</p>
                 </div>
               </div>
@@ -257,9 +257,9 @@ function ValuesSection() {
 function AchievementSection() {
   const achievements = [
     {
-      title: "Successful Inauguration",
-      description: "Launched MathX Club with 50+ founding members on September 25th, 2024.",
-      date: "September 2024",
+      title: "National Level Maths Quiz at Pillani College Pune",
+      description: "One team of MathX Club won the first prize in the National Level Maths Quiz at Pillani College Pune. Among the 4 shortlisted teams from MathX",
+      date: "2024",
       icon: "🚀"
     },
     {

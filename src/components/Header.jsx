@@ -58,13 +58,17 @@ const Header = () => {
             }`}>
               About
             </Link>
-            <a href="#events" className="text-[#AEAEAE] hover:text-[#49E3FF] transition-colors duration-300 font-medium">
+            <Link to="/events" className={`transition-colors duration-300 font-medium ${
+              location.pathname === '/events' ? 'text-white' : 'text-[#AEAEAE] hover:text-[#49E3FF]'
+            }`}>
               Events
-            </a>
-            <a href="#contact" className="text-[#AEAEAE] hover:text-[#49E3FF] transition-colors duration-300 font-medium">
+            </Link>
+            <Link to="/contact" className={`transition-colors duration-300 font-medium ${
+              location.pathname === '/contact' ? 'text-white' : 'text-[#AEAEAE] hover:text-[#49E3FF]'
+            }`}>
               Contact
-            </a>
-            <button className="bg-gradient-to-br from-[#A146D4]/80 to-[#49E3FF]/80 text-white px-6 py-2 rounded-lg font-medium hover:shadow-lg hover:shadow-[#49E3FF]/25 transition-all duration-300 hover:scale-105">
+            </Link>
+            <button onClick={() => window.location.href = '/contact'} className="bg-gradient-to-br from-[#A146D4]/80 to-[#49E3FF]/80 text-white px-6 py-2 rounded-lg font-medium hover:shadow-lg hover:shadow-[#49E3FF]/25 transition-all duration-300 hover:scale-105">
               Join Us
             </button>
           </nav>
@@ -99,13 +103,17 @@ const Header = () => {
               }`}>
                 About
               </Link>
-              <a href="#events" className="text-[#AEAEAE] hover:text-[#49E3FF] transition-colors duration-300 font-medium">
+              <Link to="/events" className={`transition-colors duration-300 font-medium ${
+                location.pathname === '/events' ? 'text-white' : 'text-[#AEAEAE] hover:text-[#49E3FF]'
+              }`}>
                 Events
-              </a>
-              <a href="#contact" className="text-[#AEAEAE] hover:text-[#49E3FF] transition-colors duration-300 font-medium">
+              </Link>
+              <Link to="/contact" className={`transition-colors duration-300 font-medium ${
+                location.pathname === '/contact' ? 'text-white' : 'text-[#AEAEAE] hover:text-[#49E3FF]'
+              }`}>
                 Contact
-              </a>
-              <button className="bg-gradient-to-br from-[#A146D4]/80 to-[#49E3FF]/80 text-white px-6 py-2 rounded-lg font-medium hover:shadow-lg hover:shadow-[#49E3FF]/25 transition-all duration-300 hover:scale-105 w-fit">
+              </Link>
+              <button onClick={() => window.location.href = '/contact'} className="bg-gradient-to-br from-[#A146D4]/80 to-[#49E3FF]/80 text-white px-6 py-2 rounded-lg font-medium hover:shadow-lg hover:shadow-[#49E3FF]/25 transition-all duration-300 hover:scale-105 w-fit">
                 Join Us
               </button>
             </nav>

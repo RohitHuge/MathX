@@ -426,10 +426,10 @@ useEffect(() => {
 
         {/* CTA Buttons (unchanged) */}
         <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-12">
-          <button className="bg-[#49E3FF]/80 text-[#191D2A] px-8 py-3 rounded-lg font-semibold hover:shadow-lg hover:shadow-[#49E3FF]/25 transition-all duration-300 hover:scale-105 transform">
+          <button onClick={() => window.location.href = '/contact'} className="bg-[#49E3FF]/80 text-[#191D2A] px-8 py-3 rounded-lg font-semibold hover:shadow-lg hover:shadow-[#49E3FF]/25 transition-all duration-300 hover:scale-105 transform">
             Join Us
           </button>
-          <button className="border-2 border-white/80 text-white px-8 py-3 rounded-lg font-semibold hover:bg-white/90 hover:text-[#191D2A] transition-all duration-300 hover:scale-105 transform">
+          <button onClick={() => window.location.href = '/about'} className="border-2 border-white/80 text-white px-8 py-3 rounded-lg font-semibold hover:bg-white/90 hover:text-[#191D2A] transition-all duration-300 hover:scale-105 transform">
             Learn More
           </button>
         </div>
@@ -623,8 +623,8 @@ function QuickStats() {
   });
 
   const targetCounts = {
-    members: 150,
-    events: 12,
+    members: 10,
+    events: 5,
     quizzes: 25
   };
 

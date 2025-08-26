@@ -181,6 +181,15 @@ function EventsGrid() {
     },
     {
       id: 4,
+      title: "MATHS Premier League",
+      date: "Coming Soon",
+      time: "TBA",
+      description: "A fun auction of brilliant minds in mathematics. Competiting with each other to win the title of Maths Premier League.",
+      highlight: "🏆 Maths Premier League",
+      status: "upcoming"
+    },
+    {
+      id: 5,
       title: "National Level Quiz",
       date: "Coming Soon",
       time: "TBA",

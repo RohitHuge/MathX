@@ -1,62 +1,299 @@
 import React, { useEffect, useState } from 'react';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
-import {TextType} from '../components/ui/TextType.jsx';
+import TextType from '../components/ui/TextType';
+import DecryptedText from '../components/ui/DecryptedText';
 
 // Hero Section Component
-function HeroSection() {
-  const [countdown, setCountdown] = useState({
-    days: 0,
-    hours: 0,
-    minutes: 0,
-    seconds: 0
-  });
-  const [showScrollButton, setShowScrollButton] = useState(true);
+// function HeroSection() {
+//   const [countdown, setCountdown] = useState({
+//     days: 0,
+//     hours: 0,
+//     minutes: 0,
+//     seconds: 0
+//   });
+//   const [showScrollButton, setShowScrollButton] = useState(true);
 
-  useEffect(() => {
-    const targetDate = new Date('2024-09-25T00:00:00');
+//   useEffect(() => {
+//     const targetDate = new Date('2024-09-25T00:00:00');
     
-    const timer = setInterval(() => {
-      const now = new Date();
-      const difference = targetDate - now;
+//     const timer = setInterval(() => {
+//       const now = new Date();
+//       const difference = targetDate - now;
       
-      if (difference > 0) {
-        const days = Math.floor(difference / (1000 * 60 * 60 * 24));
-        const hours = Math.floor((difference % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-        const minutes = Math.floor((difference % (1000 * 60 * 60)) / (1000 * 60));
-        const seconds = Math.floor((difference % (1000 * 60)) / 1000);
+//       if (difference > 0) {
+//         const days = Math.floor(difference / (1000 * 60 * 60 * 24));
+//         const hours = Math.floor((difference % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+//         const minutes = Math.floor((difference % (1000 * 60 * 60)) / (1000 * 60));
+//         const seconds = Math.floor((difference % (1000 * 60)) / 1000);
         
-        setCountdown({ days, hours, minutes, seconds });
-      }
-    }, 1000);
+//         setCountdown({ days, hours, minutes, seconds });
+//       }
+//     }, 1000);
 
-    return () => clearInterval(timer);
-  }, []);
+//     return () => clearInterval(timer);
+//   }, []);
 
-  useEffect(() => {
-    const handleScroll = () => {
-      const scrollPosition = window.scrollY;
-      const heroHeight = window.innerHeight;
+//   useEffect(() => {
+//     const handleScroll = () => {
+//       const scrollPosition = window.scrollY;
+//       const heroHeight = window.innerHeight;
       
-      // Hide button when scrolled past 80% of hero section
-      if (scrollPosition > heroHeight * 0.8) {
-        setShowScrollButton(false);
-      } else {
-        setShowScrollButton(true);
-      }
-    };
+//       // Hide button when scrolled past 80% of hero section
+//       if (scrollPosition > heroHeight * 0.8) {
+//         setShowScrollButton(false);
+//       } else {
+//         setShowScrollButton(true);
+//       }
+//     };
 
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
+//     window.addEventListener('scroll', handleScroll);
+//     return () => window.removeEventListener('scroll', handleScroll);
+//   }, []);
+
+//   return (
+//     <section id="home" className="relative text-white h-screen flex items-center justify-center overflow-hidden">
+//       {/* Full Height Gradient Background */}
+//       <div className="fixed inset-0 bg-gradient-to-br from-[#A146D4]/60 via-[#191D2A] to-[#49E3FF]/60"></div>
+      
+//       {/* Background Math Symbols */}
+//       <div className="absolute inset-0 opacity-5">
+//         <div className="absolute top-10 left-10 text-6xl">∑</div>
+//         <div className="absolute top-32 right-20 text-5xl">∫</div>
+//         <div className="absolute bottom-20 left-20 text-4xl">π</div>
+//         <div className="absolute bottom-32 right-10 text-5xl">∞</div>
+//         <div className="absolute top-1/2 left-1/3 text-3xl">√</div>
+//         <div className="absolute top-1/3 right-1/3 text-4xl">∂</div>
+        
+//         {/* Additional Math Symbols */}
+//         <div className="absolute top-16 left-1/4 text-5xl">∑</div>
+//         <div className="absolute top-40 right-1/4 text-4xl">∫</div>
+//         <div className="absolute bottom-16 right-1/3 text-5xl">π</div>
+//         <div className="absolute bottom-40 left-1/3 text-4xl">∞</div>
+//         <div className="absolute top-1/4 right-16 text-3xl">√</div>
+//         <div className="absolute top-3/4 left-16 text-4xl">∂</div>
+//         <div className="absolute top-1/3 left-1/2 text-5xl">∑</div>
+//         <div className="absolute top-2/3 right-1/2 text-4xl">∫</div>
+//         <div className="absolute top-5/6 left-1/6 text-3xl">π</div>
+//         <div className="absolute top-1/6 right-5/6 text-4xl">∞</div>
+//         <div className="absolute top-1/2 right-1/6 text-5xl">√</div>
+//         <div className="absolute top-1/6 left-5/6 text-3xl">∂</div>
+//       </div>
+      
+//       {/* Dark Center Element */}
+//       <div className="absolute inset-0 bg-gradient-radial from-transparent via-[#191D2A]/40 to-[#191D2A]/80"></div>
+      
+//       {/* Floating Dark Elements */}
+//       <div className="absolute top-1/4 left-1/4 w-32 h-32 bg-[#191D2A]/30 rounded-full blur-xl"></div>
+//       <div className="absolute bottom-1/4 right-1/4 w-40 h-40 bg-[#191D2A]/40 rounded-full blur-xl"></div>
+//       <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-24 h-24 bg-[#191D2A]/50 rounded-full blur-lg"></div>
+      
+//       <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+//         {/* <h1 className="text-6xl md:text-8xl lg:text-9xl font-bold mb-8 animate-fade-in">
+//           MathX
+//         </h1>
+//         <p className="text-2xl md:text-3xl lg:text-4xl mb-10 text-white/90 font-medium">
+//           The X Factor of Maths
+//         </p> */}
+        
+//         {/* Countdown Timer */}
+//         <div className="mb-8">
+//           <p className="text-sm mb-4 text-white/80">Inauguration on 25th September 🎉</p>
+//           <div className="flex justify-center space-x-4 md:space-x-8">
+//             {Object.entries(countdown).map(([unit, value]) => (
+//               <div key={unit} className="text-center">
+//                 <div className="bg-white/20 backdrop-blur-sm rounded-lg px-3 py-2 min-w-[60px]">
+//                   <div className="text-2xl md:text-3xl font-bold">{value.toString().padStart(2, '0')}</div>
+//                   <div className="text-xs uppercase tracking-wider">{unit}</div>
+//                 </div>
+//               </div>
+//             ))}
+//           </div>
+//         </div>
+        
+//         {/* CTA Buttons */}
+//         <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-12">
+//           <button className="bg-[#49E3FF]/80 text-[#191D2A] px-8 py-3 rounded-lg font-semibold hover:shadow-lg hover:shadow-[#49E3FF]/25 transition-all duration-300 hover:scale-105 transform">
+//             Join Us
+//           </button>
+//           <button className="border-2 border-white/80 text-white px-8 py-3 rounded-lg font-semibold hover:bg-white/90 hover:text-[#191D2A] transition-all duration-300 hover:scale-105 transform">
+//             Learn More
+//           </button>
+//         </div>
+        
+//         {/* Scroll Down Button */}
+//         <div className={`fixed bottom-8 left-1/2 transform -translate-x-1/2 z-10 transition-all duration-500 ${
+//           showScrollButton 
+//             ? 'opacity-100 translate-y-0 animate-bounce' 
+//             : 'opacity-0 translate-y-4 pointer-events-none'
+//         }`}>
+//           <button 
+//             onClick={() => document.getElementById('vision-purpose')?.scrollIntoView({ behavior: 'smooth' })}
+//             className="group flex flex-col items-center text-white/80 hover:text-white transition-colors duration-300"
+//             aria-label="Scroll down to explore more"
+//           >
+//             <span className="text-sm mb-2 font-medium">Scroll Down</span>
+//             <div className="w-6 h-10 border-2 border-white/60 rounded-full flex justify-center">
+//               <div className="w-1 h-3 bg-white/60 rounded-full mt-2 animate-pulse group-hover:bg-white transition-colors duration-300"></div>
+//             </div>
+//             <svg className="w-4 h-4 mt-1 text-white/60 group-hover:text-white transition-colors duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+//               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 14l-7 7m0 0l-7-7m7 7V3" />
+//             </svg>
+//           </button>
+//         </div>
+//       </div>
+//     </section>
+//   );
+// }
+
+function HeroSection() {
+  const tagline = "The X Factor of Maths";
+
+  // Stages: 'typing' -> 'deleting' -> 'reveal' -> 'final'
+  const [stage, setStage] = useState("typing");
+  const [manualText, setManualText] = useState(tagline); // used during deletion
+  const [showMath, setShowMath] = useState(false);
+  // const [showCursor, setShowCursor] = useState(true);
+
+  // timing controls (tweak to taste)
+  const typingSpeed = 100;        // ms per char for TextType
+  const initialDelay = 200;      // ms before typing starts
+  const pauseAfterTyping = 2000;  // ms to hold after typing completes
+  const deleteSpeed = 100;        // ms per char deletion
+  const revealDelay = 2000;       // small delay before revealing "Math"
+
+  // small HighlightX component (reusable)
+  const HighlightX = ({ className = "" }) => (
+    <span
+      className={`inline-block bg-clip-text text-transparent bg-gradient-to-r from-[#A146D4] to-[#49E3FF] font-extrabold ${className}`}
+      aria-hidden="true"
+    >
+      X
+    </span>
+  );
+
+  // compute rough typing duration so we know when to start deleting
+  useEffect(() => {
+    // total typing time ≈ initialDelay + (chars * typingSpeed) + pauseAfterTyping
+    const estimatedTypingMs = initialDelay + tagline.length * typingSpeed + pauseAfterTyping;
+    const t = setTimeout(() => {
+      // move to deletion stage (we will show manualText and delete it)
+      setManualText(tagline); // ensure manual text is full before deletion
+      setStage("deleting");
+    }, estimatedTypingMs);
+
+    return () => clearTimeout(t);
+  }, []); // run once
+
+  // deletion effect (remove chars from end until only 'X' remains)
+  // useEffect(() => {
+  //   if (stage !== "deleting") return;
+
+  //   let current = manualText;
+  //   const interval = setInterval(() => {
+  //     // If the string already ends with 'X' -> set it to exactly 'X' and stop
+  //     if (current.endsWith("X") && current.length === 1) {
+  //       current = "X";
+  //       setManualText(current);
+  //       clearInterval(interval);
+  //       // small pause then reveal Math
+  //       setTimeout(() => setStage("reveal"), 200);
+  //       return;
+  //     }
+
+  //     // otherwise delete one char from the end
+  //     if (current.length > 4) {
+  //       current = current.slice(0, -1);
+  //     }else if(current.length <= 4 && current.length > 1){
+  //       current = current.slice(0, current.length - 1);
+  //     }
+  //     setManualText(current);
+  //   }, deleteSpeed);
+
+  //   return () => clearInterval(interval);
+  // }, [stage, manualText, deleteSpeed]);
+
+  // --- REPLACE old deletion useEffect with this ---
+useEffect(() => {
+  if (stage !== "deleting") return;
+
+  // start with the current full text (should already be tagline)
+  let current = manualText;
+  // two-phase: delete from right first, then from left once we hit a string that ends with 'X'
+  let deleteFromLeft = false;
+
+  const interval = setInterval(() => {
+    // done condition: only "X" remains
+    if (current === "X") {
+      setManualText("X");
+      clearInterval(interval);
+      // small pause then proceed
+      setTimeout(() => setStage("reveal"), 200);
+      return;
+    }
+
+    // If we're not yet in left-deletion mode:
+    if (!deleteFromLeft) {
+      // If current ends with 'X' (e.g. "The X"), switch to left deletion
+      if (current.endsWith("X") && current.length > 1) {
+        deleteFromLeft = true;
+        // don't remove anything this tick — next tick will remove from left
+        return;
+      }
+      // otherwise remove one char from the end
+      current = current.slice(0, -1);
+    } else {
+      // left-deletion mode: remove one char from the start
+      current = current.substring(1);
+    }
+
+    // update visible text
+    setManualText(current);
+  }, deleteSpeed);
+
+  return () => clearInterval(interval);
+}, [stage, deleteSpeed]);
+
+
+  // reveal the big "Math" (slide in) then show final tagline
+  useEffect(() => {
+    if (stage !== "reveal") return;
+    // small kickoff
+    setShowMath(false);
+    const t1 = setTimeout(() => {
+      setShowMath(true); // triggers CSS transition to slide Math in
+      // after the reveal, show tagline
+      const t2 = setTimeout(() => setStage("final"), 900);
+      return () => clearTimeout(t2);
+    }, revealDelay);
+
+    return () => clearTimeout(t1);
+  }, [stage]);
+
+  // helper to render manualText but highlight X if present
+  const renderWithHighlightX = (text) => {
+    if (!text.includes("X")) return <span>{text}</span>;
+    const [left, right] = text.split("X");
+    return (
+      <>
+        <span>{left}</span>
+        <HighlightX />
+        <span>{right}</span>
+      </>
+    );
+  };
+
+ 
+
+  // optional: respect reduced-motion preference
+  const prefersReduced = typeof window !== "undefined" && window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
   return (
     <section id="home" className="relative text-white h-screen flex items-center justify-center overflow-hidden">
-      {/* Full Height Gradient Background */}
+      {/* Background layers (keep your existing background symbols) */}
       <div className="fixed inset-0 bg-gradient-to-br from-[#A146D4]/60 via-[#191D2A] to-[#49E3FF]/60"></div>
-      
-      {/* Background Math Symbols */}
       <div className="absolute inset-0 opacity-5">
+        {/* (your math symbols here — keep as-is) */}
         <div className="absolute top-10 left-10 text-6xl">∑</div>
         <div className="absolute top-32 right-20 text-5xl">∫</div>
         <div className="absolute bottom-20 left-20 text-4xl">π</div>
@@ -78,66 +315,101 @@ function HeroSection() {
         <div className="absolute top-1/2 right-1/6 text-5xl">√</div>
         <div className="absolute top-1/6 left-5/6 text-3xl">∂</div>
       </div>
-      
-      {/* Dark Center Element */}
       <div className="absolute inset-0 bg-gradient-radial from-transparent via-[#191D2A]/40 to-[#191D2A]/80"></div>
-      
-      {/* Floating Dark Elements */}
-      <div className="absolute top-1/4 left-1/4 w-32 h-32 bg-[#191D2A]/30 rounded-full blur-xl"></div>
-      <div className="absolute bottom-1/4 right-1/4 w-40 h-40 bg-[#191D2A]/40 rounded-full blur-xl"></div>
-      <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-24 h-24 bg-[#191D2A]/50 rounded-full blur-lg"></div>
-      
+
       <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-        {/* <h1 className="text-6xl md:text-8xl lg:text-9xl font-bold mb-8 animate-fade-in">
-          MathX
-        </h1>
-        <p className="text-2xl md:text-3xl lg:text-4xl mb-10 text-white/90 font-medium">
-          The X Factor of Maths
-        </p> */}
-        
-        {/* Countdown Timer */}
-        <div className="mb-8">
-          <p className="text-sm mb-4 text-white/80">Inauguration on 25th September 🎉</p>
-          <div className="flex justify-center space-x-4 md:space-x-8">
-            {Object.entries(countdown).map(([unit, value]) => (
-              <div key={unit} className="text-center">
-                <div className="bg-white/20 backdrop-blur-sm rounded-lg px-3 py-2 min-w-[60px]">
-                  <div className="text-2xl md:text-3xl font-bold">{value.toString().padStart(2, '0')}</div>
-                  <div className="text-xs uppercase tracking-wider">{unit}</div>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-        
-        {/* CTA Buttons */}
+        {/* --- STAGE: typing (TextType) --- */}
+        {stage === "typing" && (
+          <>
+            <h1 className="text-6xl md:text-8xl lg:text-9xl font-bold mb-6">
+              {/* Use TextType to type the full tagline first (single run) */}
+              <TextType
+                as="span"
+                text={tagline}
+                typingSpeed={typingSpeed}
+                initialDelay={initialDelay}
+                pauseDuration={pauseAfterTyping}
+                deletingSpeed={40}
+                loop={false}
+                showCursor={true}
+                cursorCharacter="|"
+                className="inline-block"
+                // keep color white until deletion phase; we will highlight X later
+                textColors={["#FFFFFF"]}
+              />
+            </h1>
+            {/* <p className="text-sm text-white/80 mb-8">Inauguration on 25th September 🎉</p> */}
+          </>
+        )}
+
+        {/* --- STAGE: deleting (manual deletion rendering) --- */}
+        {stage === "deleting" && (
+          <>
+            <h1 className="text-6xl md:text-8xl lg:text-9xl font-bold mb-6" aria-live="polite">
+              {renderWithHighlightX(manualText)}
+            </h1>
+            {/* <p className="text-sm text-white/70 mb-8">Hold on...</p> */}
+          </>
+        )}
+
+        {/* --- STAGE: reveal / final (MathX) --- */}
+        {(stage === "reveal" || stage === "final") && (
+          <>
+            <h1 className="text-6xl md:text-8xl lg:text-9xl font-extrabold mb-6 flex items-end justify-center gap-3">
+              {/* "Math" appears from left */}
+              <span
+                // className={`inline-block transform transition-all duration-700 ${
+                //   showMath && !prefersReduced ? "opacity-100 translate-x-0" : "opacity-0 -translate-x-8"
+                // }`}
+                aria-hidden={!showMath}
+              >
+                <TextType
+                  as="span"
+                  text="Math"
+                  typingSpeed={typingSpeed}
+                  initialDelay={initialDelay}
+                  pauseDuration={pauseAfterTyping}
+                  deletingSpeed={deleteSpeed}
+                  loop={false}
+                  showCursor={false}
+                  cursorCharacter="|"
+                  className="inline-block"
+                  textColors={["#FFFFFF"]}
+                  
+                />
+              </span>
+
+              {/* glowing X */}
+              <span className="inline-block bg-clip-text text-transparent bg-gradient-to-r from-[#A146D4] to-[#49E3FF]">
+                X
+              </span>
+            </h1>
+
+            {/* tagline fades in for final stage */}
+            {stage === "final" && (
+               <p
+                className={`text-2xl md:text-3xl lg:text-4xl mb-10 text-white/90 font-medium transition-opacity duration-700 ${
+                  !prefersReduced ? "opacity-100" : "opacity-100"
+                }`}
+                style={{ transitionDelay: "350ms" }}
+              >
+                <DecryptedText
+                  text="The X Factor of Maths"
+                  animateOn="view"
+                  revealDirection="left"
+                />
+              </p> 
+            )}
+          </>
+        )}
+
+        {/* CTA Buttons (unchanged) */}
         <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-12">
           <button className="bg-[#49E3FF]/80 text-[#191D2A] px-8 py-3 rounded-lg font-semibold hover:shadow-lg hover:shadow-[#49E3FF]/25 transition-all duration-300 hover:scale-105 transform">
             Join Us
           </button>
           <button className="border-2 border-white/80 text-white px-8 py-3 rounded-lg font-semibold hover:bg-white/90 hover:text-[#191D2A] transition-all duration-300 hover:scale-105 transform">
             Learn More
-          </button>
-        </div>
-        
-        {/* Scroll Down Button */}
-        <div className={`fixed bottom-8 left-1/2 transform -translate-x-1/2 z-10 transition-all duration-500 ${
-          showScrollButton 
-            ? 'opacity-100 translate-y-0 animate-bounce' 
-            : 'opacity-0 translate-y-4 pointer-events-none'
-        }`}>
-          <button 
-            onClick={() => document.getElementById('vision-purpose')?.scrollIntoView({ behavior: 'smooth' })}
-            className="group flex flex-col items-center text-white/80 hover:text-white transition-colors duration-300"
-            aria-label="Scroll down to explore more"
-          >
-            <span className="text-sm mb-2 font-medium">Scroll Down</span>
-            <div className="w-6 h-10 border-2 border-white/60 rounded-full flex justify-center">
-              <div className="w-1 h-3 bg-white/60 rounded-full mt-2 animate-pulse group-hover:bg-white transition-colors duration-300"></div>
-            </div>
-            <svg className="w-4 h-4 mt-1 text-white/60 group-hover:text-white transition-colors duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 14l-7 7m0 0l-7-7m7 7V3" />
-            </svg>
           </button>
         </div>
       </div>

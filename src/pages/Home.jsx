@@ -149,7 +149,7 @@ import CountUp from '../components/ui/countup';
 // }
 
 function HeroSection() {
-  const tagline = "The X Factor of Maths";
+  const tagline = "Where MATHS meets eXcellence";
 
   // Stages: 'typing' -> 'deleting' -> 'reveal' -> 'final'
   const [stage, setStage] = useState("typing");

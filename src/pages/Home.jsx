@@ -3,6 +3,7 @@ import Header from '../components/Header';
 import Footer from '../components/Footer';
 import TextType from '../components/ui/TextType';
 import DecryptedText from '../components/ui/DecryptedText';
+import ScrollFloat from '../components/ui/ScrollFloat';
 
 // Hero Section Component
 // function HeroSection() {
@@ -153,6 +154,7 @@ function HeroSection() {
   const [stage, setStage] = useState("typing");
   const [manualText, setManualText] = useState(tagline); // used during deletion
   const [showMath, setShowMath] = useState(false);
+  const [showScrollButton, setShowScrollButton] = useState(true);
   // const [showCursor, setShowCursor] = useState(true);
 
   // timing controls (tweak to taste)
@@ -269,6 +271,24 @@ useEffect(() => {
 
     return () => clearTimeout(t1);
   }, [stage]);
+
+  // Scroll effect to hide/show scroll button
+  useEffect(() => {
+    const handleScroll = () => {
+      const scrollPosition = window.scrollY;
+      const heroHeight = window.innerHeight;
+      
+      // Hide button when scrolled past 80% of hero section
+      if (scrollPosition > heroHeight * 0.8) {
+        setShowScrollButton(false);
+      } else {
+        setShowScrollButton(true);
+      }
+    };
+
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
 
   // helper to render manualText but highlight X if present
   const renderWithHighlightX = (text) => {
@@ -412,6 +432,26 @@ useEffect(() => {
             Learn More
           </button>
         </div>
+
+        <div className={`fixed bottom-8 left-1/2 transform -translate-x-1/2 z-10 transition-all duration-500 ${
+          showScrollButton 
+            ? 'opacity-100 translate-y-0 animate-bounce' 
+            : 'opacity-0 translate-y-4 pointer-events-none'
+        }`}>
+          <button 
+            onClick={() => document.getElementById('vision-purpose')?.scrollIntoView({ behavior: 'smooth' })}
+            className="group flex flex-col items-center text-white/80 hover:text-white transition-colors duration-300"
+            aria-label="Scroll down to explore more"
+          >
+            <span className="text-sm mb-2 font-medium">Scroll Down</span>
+            <div className="w-6 h-10 border-2 border-white/60 rounded-full flex justify-center">
+              <div className="w-1 h-3 bg-white/60 rounded-full mt-2 animate-pulse group-hover:bg-white transition-colors duration-300"></div>
+            </div>
+            <svg className="w-4 h-4 mt-1 text-white/60 group-hover:text-white transition-colors duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 14l-7 7m0 0l-7-7m7 7V3" />
+            </svg>
+          </button>
+        </div>
       </div>
     </section>
   );
@@ -427,13 +467,13 @@ function VisionPurpose() {
       <div className="absolute bottom-1/4 right-1/3 w-56 h-56 bg-[#191D2A]/50 rounded-full blur-3xl"></div>
       
       <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <h2 className="text-3xl md:text-4xl font-bold text-center mb-12">
-          Why MathX Exists
+        <h2 className="text-3xl md:text-5xl lg:text-7xl font-bold text-center mb-12 animate-on-scroll">
+            Why MathX Exists?
         </h2>
         
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
           {/* Vision Card */}
-          <div className="group relative p-8 border border-[#A146D4]/30 rounded-xl bg-[#191D2A] hover:border-[#A146D4] transition-all duration-500 hover:shadow-lg hover:shadow-[#A146D4]/20 hover:scale-105 transform">
+          <div className="group relative p-8 border border-[#A146D4]/30 rounded-xl bg-[#191D2A] hover:border-[#A146D4] transition-all duration-500 hover:shadow-lg hover:shadow-[#A146D4]/20 hover:scale-105 transform animate-on-scroll" data-delay="200">
             <div className="absolute inset-0 bg-gradient-to-tr from-[#A146D4]/5 to-[#49E3FF]/5 rounded-xl opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
             <div className="relative">
               <div className="w-16 h-16 bg-gradient-to-tr from-[#A146D4]/80 to-[#49E3FF]/80 rounded-xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300">
@@ -451,7 +491,7 @@ function VisionPurpose() {
           </div>
           
           {/* Mission Card */}
-          <div className="group relative p-8 border border-[#A146D4]/30 rounded-xl bg-[#191D2A] hover:border-[#A146D4] transition-all duration-500 hover:shadow-lg hover:shadow-[#A146D4]/20 hover:scale-105 transform">
+          <div className="group relative p-8 border border-[#A146D4]/30 rounded-xl bg-[#191D2A] hover:border-[#A146D4] transition-all duration-500 hover:shadow-lg hover:shadow-[#A146D4]/20 hover:scale-105 transform animate-on-scroll" data-delay="400">
             <div className="absolute inset-0 bg-gradient-to-bl from-[#A146D4]/5 to-[#49E3FF]/5 rounded-xl opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
             <div className="relative">
               <div className="w-16 h-16 bg-gradient-to-bl from-[#A146D4]/80 to-[#49E3FF]/80 rounded-xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300">
@@ -513,13 +553,13 @@ function UpcomingEvents() {
       <div className="absolute bottom-1/3 right-1/4 w-44 h-44 bg-[#191D2A]/60 rounded-full blur-3xl"></div>
       
       <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <h2 className="text-3xl md:text-4xl font-bold text-center mb-12">
+        <h2 className="text-3xl md:text-4xl font-bold text-center mb-12 animate-on-scroll">
           Upcoming Events
         </h2>
         
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {events.map((event) => (
-            <div key={event.id} className="group relative p-6 border border-[#A146D4]/30 rounded-xl bg-[#191D2A] hover:border-[#49E3FF] transition-all duration-500 hover:shadow-lg hover:shadow-[#49E3FF]/20 hover:scale-105 transform">
+          {events.map((event, index) => (
+            <div key={event.id} className="group relative p-6 border border-[#A146D4]/30 rounded-xl bg-[#191D2A] hover:border-[#49E3FF] transition-all duration-500 hover:shadow-lg hover:shadow-[#49E3FF]/20 hover:scale-105 transform animate-on-scroll" data-delay={index * 200}>
               <div className="absolute top-4 right-4">
                 {event.status === 'upcoming' && (
                   <span className="bg-[#49E3FF] text-[#191D2A] px-2 py-1 rounded-full text-xs font-semibold">
@@ -642,13 +682,13 @@ function QuickStats() {
       <div className="absolute bottom-1/4 left-1/3 w-48 h-48 bg-[#191D2A]/55 rounded-full blur-3xl"></div>
       
       <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <h2 className="text-3xl md:text-4xl font-bold text-center mb-12">
+        <h2 className="text-3xl md:text-4xl font-bold text-center mb-12 animate-on-scroll">
           Quick Stats
         </h2>
         
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           {stats.map((stat, index) => (
-            <div key={index} className="text-center group">
+            <div key={index} className="text-center group animate-on-scroll" data-delay={index * 200}>
               <div className="w-24 h-24 mx-auto mb-4 bg-gradient-to-br from-[#A146D4]/80 to-[#49E3FF]/80 rounded-full flex items-center justify-center text-4xl group-hover:scale-110 transition-transform duration-300">
                 {stat.icon}
               </div>
@@ -682,14 +722,14 @@ function JoinBanner() {
       <div className="absolute inset-0 bg-gradient-radial from-transparent via-[#191D2A]/30 to-[#191D2A]/60"></div>
       
       <div className="relative max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-        <h2 className="text-3xl md:text-4xl font-bold mb-6">
+        <h2 className="text-3xl md:text-4xl font-bold mb-6 animate-on-scroll">
           Be Part of the X Factor of Maths
         </h2>
-        <p className="text-xl mb-8 text-white/90 leading-relaxed">
+        <p className="text-xl mb-8 text-white/90 leading-relaxed animate-on-scroll" data-delay="200">
           Join our community of passionate mathematicians, problem solvers, and innovators. 
           Discover the beauty of mathematics through interactive experiences and collaborative learning.
         </p>
-        <button className="bg-white/90 text-[#191D2A] px-8 py-3 rounded-lg font-semibold hover:shadow-lg hover:shadow-white/25 transition-all duration-300 hover:scale-105 transform">
+        <button className="bg-white/90 text-[#191D2A] px-8 py-3 rounded-lg font-semibold hover:shadow-lg hover:shadow-white/25 transition-all duration-300 hover:scale-105 transform animate-on-scroll" data-delay="400">
           Register Now
         </button>
       </div>
@@ -726,12 +766,12 @@ function FunFacts() {
       <div className="absolute bottom-1/3 right-1/2 transform translate-x-1/2 w-32 h-32 bg-[#191D2A]/60 rounded-full blur-3xl"></div>
       
       <div className="relative max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-        <h2 className="text-3xl md:text-4xl font-bold mb-12">
+        <h2 className="text-3xl md:text-4xl font-bold mb-12 animate-on-scroll">
           Math Fun Facts
         </h2>
         
         <div className="relative">
-          <div className="bg-gradient-to-tl from-[#A146D4]/20 to-[#49E3FF]/20 border border-[#A146D4]/30 rounded-xl p-8 md:p-12">
+          <div className="bg-gradient-to-tl from-[#A146D4]/20 to-[#49E3FF]/20 border border-[#A146D4]/30 rounded-xl p-8 md:p-12 animate-on-scroll" data-delay="200">
             <div className="text-6xl mb-6">🧮</div>
             <p className="text-xl md:text-2xl text-white leading-relaxed min-h-[60px] flex items-center justify-center">
               {funFacts[currentFactIndex]}
@@ -763,6 +803,30 @@ function FunFacts() {
 export default function Home() {
   useEffect(() => {
     document.title = "MathX | The X Factor of Maths";
+  }, []);
+
+  // Scroll animation effect
+  useEffect(() => {
+    const observerOptions = {
+      threshold: 0.1,
+      rootMargin: '0px 0px -50px 0px'
+    };
+
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('animate-in');
+        }
+      });
+    }, observerOptions);
+
+    // Observe all elements with animate-on-scroll class
+    const animatedElements = document.querySelectorAll('.animate-on-scroll');
+    animatedElements.forEach((el) => observer.observe(el));
+
+    return () => {
+      animatedElements.forEach((el) => observer.unobserve(el));
+    };
   }, []);
 
   return (

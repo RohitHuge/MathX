@@ -75,3 +75,28 @@ a:focus {
   transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
   transition-duration: 150ms;
 }
+
+/* Scroll-triggered animations */
+.animate-on-scroll {
+  opacity: 0;
+  transform: translateY(30px);
+  transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.animate-on-scroll.animate-in {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Staggered animation delays */
+[data-delay="200"] {
+  transition-delay: 200ms;
+}
+
+[data-delay="400"] {
+  transition-delay: 400ms;
+}
+
+[data-delay="600"] {
+  transition-delay: 600ms;
+}

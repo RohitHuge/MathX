@@ -100,3 +100,17 @@ a:focus {
 [data-delay="600"] {
   transition-delay: 600ms;
 }
+
+/* Floating animation for math symbols */
+@keyframes float-slow {
+  0%, 100% {
+    transform: translateY(0px) rotate(0deg);
+  }
+  50% {
+    transform: translateY(-20px) rotate(5deg);
+  }
+}
+
+.animate-float-slow {
+  animation: float-slow 8s ease-in-out infinite;
+}

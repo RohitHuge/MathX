@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
+import {TextType} from '../components/ui/TextType.jsx';
 
 // Hero Section Component
 function HeroSection() {
@@ -87,15 +88,15 @@ function HeroSection() {
       <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-24 h-24 bg-[#191D2A]/50 rounded-full blur-lg"></div>
       
       <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-        <h1 className="text-6xl md:text-8xl lg:text-9xl font-bold mb-8 animate-fade-in">
+        {/* <h1 className="text-6xl md:text-8xl lg:text-9xl font-bold mb-8 animate-fade-in">
           MathX
         </h1>
         <p className="text-2xl md:text-3xl lg:text-4xl mb-10 text-white/90 font-medium">
           The X Factor of Maths
-        </p>
+        </p> */}
         
         {/* Countdown Timer */}
-        {/* <div className="mb-8">
+        <div className="mb-8">
           <p className="text-sm mb-4 text-white/80">Inauguration on 25th September 🎉</p>
           <div className="flex justify-center space-x-4 md:space-x-8">
             {Object.entries(countdown).map(([unit, value]) => (
@@ -107,7 +108,7 @@ function HeroSection() {
               </div>
             ))}
           </div>
-        </div> */}
+        </div>
         
         {/* CTA Buttons */}
         <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-12">

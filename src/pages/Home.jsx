@@ -3,7 +3,8 @@ import Header from '../components/Header';
 import Footer from '../components/Footer';
 import TextType from '../components/ui/TextType';
 import DecryptedText from '../components/ui/DecryptedText';
-import ScrollFloat from '../components/ui/ScrollFloat';
+// import ScrollFloat from '../components/ui/ScrollFloat';
+import CountUp from '../components/ui/countup';
 
 // Hero Section Component
 // function HeroSection() {
@@ -693,7 +694,15 @@ function QuickStats() {
                 {stat.icon}
               </div>
               <div className="text-4xl md:text-5xl font-bold mb-2 bg-gradient-to-br from-[#A146D4]/80 to-[#49E3FF]/80 bg-clip-text text-transparent">
-                {stat.count}+
+              <CountUp
+                from={0}
+                to={stat.count}
+                separator=","
+                direction="up"
+                duration={1}
+                className="count-up-text"
+                /> 
+                +
               </div>
               <p className="text-[#AEAEAE] text-lg font-medium">
                 {stat.label}
@@ -709,9 +718,9 @@ function QuickStats() {
 // Join Us Call-to-Action Banner Component
 function JoinBanner() {
   return (
-    <section className="py-16 bg-gradient-to-bl from-[#A146D4]/70 via-[#191D2A] to-[#49E3FF]/70 text-white text-center relative overflow-hidden">
+    <section className="py-16 bg-[#49E3FF] opacity-65 text-white text-center relative overflow-hidden">
       {/* Background Pattern */}
-      <div className="absolute inset-0 opacity-5">
+      <div className="absolute inset-0 opacity-75 text-white">
         <div className="absolute top-10 left-10 text-6xl">∑</div>
         <div className="absolute bottom-20 right-10 text-5xl">∫</div>
         <div className="absolute top-1/2 left-1/4 text-4xl">π</div>
@@ -722,14 +731,14 @@ function JoinBanner() {
       <div className="absolute inset-0 bg-gradient-radial from-transparent via-[#191D2A]/30 to-[#191D2A]/60"></div>
       
       <div className="relative max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-        <h2 className="text-3xl md:text-4xl font-bold mb-6 animate-on-scroll">
+        <h2 className="text-3xl md:text-4xl opacity-100 font-bold mb-6 animate-on-scroll text-[#191D2A]">
           Be Part of the X Factor of Maths
         </h2>
-        <p className="text-xl mb-8 text-white/90 leading-relaxed animate-on-scroll" data-delay="200">
+        <p className="text-xl mb-8 text-[#191D2A]/80 opacity-100 leading-relaxed animate-on-scroll" data-delay="200">
           Join our community of passionate mathematicians, problem solvers, and innovators. 
           Discover the beauty of mathematics through interactive experiences and collaborative learning.
         </p>
-        <button className="bg-white/90 text-[#191D2A] px-8 py-3 rounded-lg font-semibold hover:shadow-lg hover:shadow-white/25 transition-all duration-300 hover:scale-105 transform animate-on-scroll" data-delay="400">
+        <button className="bg-[#191D2A] opacity-100 text-white px-8 py-3 rounded-lg font-semibold hover:shadow-lg hover:shadow-[#191D2A]/25 transition-all duration-300 hover:scale-105 transform animate-on-scroll" data-delay="400">
           Register Now
         </button>
       </div>

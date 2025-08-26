@@ -528,12 +528,12 @@ function UpcomingEvents() {
     },
     {
       id: 2,
-      title: "Weekly Online Quiz",
-      date: "Every Saturday",
-      time: "2:00 PM",
-      description: "Test your mathematical skills in our weekly online quiz competition. Challenge yourself and compete with peers.",
-      highlight: "Get Certificate Instantly",
-      status: "ongoing"
+      title: "MATHS Premier League",
+      date: "Coming Soon",
+      time: "TBA",
+      description: "A fun auction of brilliant minds in mathematics. Competiting with each other to win the title of Maths Premier League.",
+      highlight: "🏆 Put your bid for best Maths minds",
+      status: "upcoming"
     },
     {
       id: 3,

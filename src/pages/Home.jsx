@@ -10,6 +10,7 @@ function HeroSection() {
     minutes: 0,
     seconds: 0
   });
+  const [showScrollButton, setShowScrollButton] = useState(true);
 
   useEffect(() => {
     const targetDate = new Date('2024-09-25T00:00:00');
@@ -29,6 +30,23 @@ function HeroSection() {
     }, 1000);
 
     return () => clearInterval(timer);
+  }, []);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      const scrollPosition = window.scrollY;
+      const heroHeight = window.innerHeight;
+      
+      // Hide button when scrolled past 80% of hero section
+      if (scrollPosition > heroHeight * 0.8) {
+        setShowScrollButton(false);
+      } else {
+        setShowScrollButton(true);
+      }
+    };
+
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
   return (
@@ -92,12 +110,33 @@ function HeroSection() {
         </div> */}
         
         {/* CTA Buttons */}
-        <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
+        <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-12">
           <button className="bg-[#49E3FF]/80 text-[#191D2A] px-8 py-3 rounded-lg font-semibold hover:shadow-lg hover:shadow-[#49E3FF]/25 transition-all duration-300 hover:scale-105 transform">
             Join Us
           </button>
           <button className="border-2 border-white/80 text-white px-8 py-3 rounded-lg font-semibold hover:bg-white/90 hover:text-[#191D2A] transition-all duration-300 hover:scale-105 transform">
             Learn More
+          </button>
+        </div>
+        
+        {/* Scroll Down Button */}
+        <div className={`fixed bottom-8 left-1/2 transform -translate-x-1/2 z-10 transition-all duration-500 ${
+          showScrollButton 
+            ? 'opacity-100 translate-y-0 animate-bounce' 
+            : 'opacity-0 translate-y-4 pointer-events-none'
+        }`}>
+          <button 
+            onClick={() => document.getElementById('vision-purpose')?.scrollIntoView({ behavior: 'smooth' })}
+            className="group flex flex-col items-center text-white/80 hover:text-white transition-colors duration-300"
+            aria-label="Scroll down to explore more"
+          >
+            <span className="text-sm mb-2 font-medium">Scroll Down</span>
+            <div className="w-6 h-10 border-2 border-white/60 rounded-full flex justify-center">
+              <div className="w-1 h-3 bg-white/60 rounded-full mt-2 animate-pulse group-hover:bg-white transition-colors duration-300"></div>
+            </div>
+            <svg className="w-4 h-4 mt-1 text-white/60 group-hover:text-white transition-colors duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 14l-7 7m0 0l-7-7m7 7V3" />
+            </svg>
           </button>
         </div>
       </div>
@@ -108,7 +147,7 @@ function HeroSection() {
 // Vision & Purpose Section Component
 function VisionPurpose() {
   return (
-    <section className="py-16 bg-[#191D2A] text-white relative overflow-hidden">
+    <section id="vision-purpose" className="py-16 bg-[#191D2A] text-white relative overflow-hidden">
       {/* Dark Center Elements */}
       <div className="absolute inset-0 bg-gradient-radial from-transparent via-[#191D2A]/20 to-[#191D2A]/40"></div>
       <div className="absolute top-1/4 left-1/3 w-48 h-48 bg-[#191D2A]/60 rounded-full blur-3xl"></div>

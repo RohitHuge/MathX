@@ -142,8 +142,8 @@ function MentorSection() {
 // Core Team Section Component
 function CoreTeamSection() {
   const [activeTeamIndex, setActiveTeamIndex] = React.useState(0);
-  const [isHovered, setIsHovered] = React.useState(false);
   const [isTransitioning, setIsTransitioning] = React.useState(false);
+  const [progress, setProgress] = React.useState(0);
 
   const teams = [
     {
@@ -201,7 +201,7 @@ function CoreTeamSection() {
       name: "Admin",
       members: [
         { name: "Krishna P.", role: "SE COMP", tagline: "Organizer-in-Chief", emoji: "📅" },
-        { name: "Rajat K.", role: "SE COMP", tagline: "Efficiency Expert"  , emoji: "⚡" },
+        { name: "Rajat P.", role: "SE COMP", tagline: "Efficiency Expert"  , emoji: "⚡" },
         { name: "Shravani J.", role: "SE COMP", tagline:"Finance Guru", emoji: "💸" },
         { name: "Parth", role: "SE COMP", tagline: "Record Keeper", emoji: "🗃️" },
         { name: "Vedant P.", role: "SE COMP", tagline: "Compliance Expert", emoji: "🛡️" },
@@ -210,22 +210,35 @@ function CoreTeamSection() {
     }
   ];
 
-  // Auto-rotation effect
+  // Auto-rotation effect with progress bar
   React.useEffect(() => {
-    if (isHovered || isTransitioning) return; // Pause on hover or during transitions
+    if (isTransitioning) return; // Pause during transitions
 
-    const interval = setInterval(() => {
-      setActiveTeamIndex((prevIndex) => (prevIndex + 1) % teams.length);
-    }, 4000);
+    const duration = 4000; // 4 seconds
+    const interval = 50; // Update every 50ms for smooth progress
+    let startTime = Date.now();
 
-    return () => clearInterval(interval);
-  }, [isHovered, isTransitioning, teams.length]);
+    const progressInterval = setInterval(() => {
+      const elapsed = Date.now() - startTime;
+      const progressPercent = Math.min((elapsed / duration) * 100, 100);
+      setProgress(progressPercent);
+
+      if (elapsed >= duration) {
+        setActiveTeamIndex((prevIndex) => (prevIndex + 1) % teams.length);
+        setProgress(0);
+        startTime = Date.now();
+      }
+    }, interval);
+
+    return () => clearInterval(progressInterval);
+  }, [activeTeamIndex, isTransitioning, teams.length]);
 
   const handleTabClick = (index) => {
     if (index === activeTeamIndex) return; // Don't switch if already active
     
     setIsTransitioning(true);
     setActiveTeamIndex(index);
+    setProgress(0); // Reset progress when manually switching
     
     // Reset transition state after animation completes
     setTimeout(() => {
@@ -234,18 +247,14 @@ function CoreTeamSection() {
   };
 
   return (
-    <section 
-      className="py-20 bg-[#191D2A]"
-      onMouseEnter={() => setIsHovered(true)}
-      onMouseLeave={() => setIsHovered(false)}
-    >
+    <section className="py-20 bg-[#191D2A]">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <h2 className="text-4xl md:text-5xl font-bold text-white text-center mb-16">
           Team Members
         </h2>
         
         {/* Team Tabs */}
-        <div className="flex flex-wrap justify-center gap-4 mb-12">
+        <div className="flex flex-wrap justify-center gap-4 mb-8">
           {teams.map((team, index) => (
             <button
               key={index}
@@ -263,6 +272,16 @@ function CoreTeamSection() {
               )}
             </button>
           ))}
+        </div>
+        
+        {/* Progress Bar */}
+        <div className="max-w-md mx-auto mb-12">
+          <div className="w-full bg-[#AEAEAE]/20 rounded-full h-1 overflow-hidden">
+            <div 
+              className="h-full bg-gradient-to-r from-[#A146D4] to-[#49E3FF] rounded-full transition-all duration-75 ease-linear"
+              style={{ width: `${progress}%` }}
+            ></div>
+          </div>
         </div>
         
         {/* Team Members Grid with Fade Animation */}

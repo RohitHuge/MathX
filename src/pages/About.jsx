@@ -64,49 +64,75 @@ function VisionPurpose() {
 
 // Mentor Section Component
 function MentorSection() {
+  const mentors = [
+    {
+      name: "Mrs. Manisha Deshpande",
+      role: "Head of Mathematics Department (FE)",
+      qualification: "M.Sc. in Mathematics, Pune University( Gold Medalist), NET AIR38",
+      specialization: "Specializes in Calculus and Graph Theory",
+      email: "manisha.deshpande@pccoer.in",
+      phone: "+91 9823000000",
+      emoji: "👨‍🏫",
+      message: "Mathematics is the foundation of all sciences. Every problem has a solution, and every solution leads to new discoveries."
+    },
+    {
+      name: "Mr. Sachin Varpe",
+      role: "Professor of Applied Mathematics",
+      qualification: "M.Sc., B.Ed. , SET",
+      specialization: "PhD. Persuing in Intergral Transform",
+      email: "sachin.varpe@pccoer.in",
+      phone: "+91 9876543210",
+      emoji: "👨‍🎓",
+      message: "Mathematics is not just about numbers and formulas; it's about understanding the patterns that govern our universe."
+    }
+  ];
+
   return (
     <section className="py-20 bg-[#191D2A]">
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <h2 className="text-4xl md:text-5xl font-bold text-white text-center mb-16 animate-on-scroll" data-delay="100">
-          Our Mentor
+          Our Mentors
         </h2>
         
-        {/* Mentor Card */}
-        <div className="group relative max-w-2xl mx-auto animate-on-scroll" data-delay="300">
-          {/* Gradient Border */}
-          <div className="absolute inset-0 bg-gradient-to-r from-[#A146D4] to-[#49E3FF] rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500 blur-sm"></div>
-          
-          {/* Card Content */}
-          <div className="relative bg-[#191D2A] border border-[#A146D4]/30 rounded-2xl p-8 group-hover:border-[#A146D4] transition-all duration-500 hover:shadow-lg hover:shadow-[#A146D4]/20 hover:scale-105 transform">
-            <div className="flex flex-col md:flex-row items-center md:items-start gap-6">
-              {/* Mentor Photo */}
-              <div className="w-32 h-32 bg-gradient-to-br from-[#A146D4]/20 to-[#49E3FF]/20 rounded-full flex items-center justify-center border-2 border-[#A146D4]/30">
-                <span className="text-4xl text-[#49E3FF]">👨‍🏫</span>
-              </div>
+        {/* Mentor Cards Grid */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+          {mentors.map((mentor, index) => (
+            <div key={index} className="group relative animate-on-scroll" data-delay={300 + (index * 200)}>
+              {/* Gradient Border */}
+              <div className="absolute inset-0 bg-gradient-to-r from-[#A146D4] to-[#49E3FF] rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500 blur-sm"></div>
               
-              {/* Mentor Info */}
-              <div className="text-center md:text-left flex-1">
-                <h3 className="text-2xl font-bold text-white mb-2">Mrs. Manisha Deshpande</h3>
-                <p className="text-lg text-[#49E3FF] mb-3">Head of Mathematics Department (FE)</p>
-                <p className="text-[#AEAEAE] mb-4">
-                  M.Sc. in Mathematics, University of Mumbai<br/>
-                  Specializes in calculus and matrices
-                </p>
-                <p className="text-[#AEAEAE] mb-4">
-                  📧 manisha.deshpande@pccoer.in<br/>
-                  📱 +91 9823000000
-                </p>
-                
-                {/* Inspiring Message */}
-                <div className="mt-6 p-4 bg-gradient-to-r from-[#A146D4]/10 to-[#49E3FF]/10 rounded-lg border border-[#A146D4]/20">
-                  <p className="text-white italic">
-                    "Mathematics is the foundation of all sciences. Every problem has a solution, 
-                    and every solution leads to new discoveries."
-                  </p>
+              {/* Card Content */}
+              <div className="relative bg-[#191D2A] border border-[#A146D4]/30 rounded-2xl p-8 group-hover:border-[#A146D4] transition-all duration-500 hover:shadow-lg hover:shadow-[#A146D4]/20 hover:scale-105 transform">
+                <div className="flex flex-col md:flex-row items-center md:items-start gap-6">
+                  {/* Mentor Photo */}
+                  <div className="w-32 h-32 bg-gradient-to-br from-[#A146D4]/20 to-[#49E3FF]/20 rounded-full flex items-center justify-center border-2 border-[#A146D4]/30">
+                    <span className="text-4xl text-[#49E3FF]">{mentor.emoji}</span>
+                  </div>
+                  
+                  {/* Mentor Info */}
+                  <div className="text-center md:text-left flex-1">
+                    <h3 className="text-2xl font-bold text-white mb-2">{mentor.name}</h3>
+                    <p className="text-lg text-[#49E3FF] mb-3">{mentor.role}</p>
+                    <p className="text-[#AEAEAE] mb-4">
+                      {mentor.qualification}<br/>
+                      {mentor.specialization}
+                    </p>
+                    <p className="text-[#AEAEAE] mb-4">
+                      📧 {mentor.email}<br/>
+                      📱 {mentor.phone}
+                    </p>
+                    
+                    {/* Inspiring Message */}
+                    <div className="mt-6 p-4 bg-gradient-to-r from-[#A146D4]/10 to-[#49E3FF]/10 rounded-lg border border-[#A146D4]/20">
+                      <p className="text-white italic">
+                        "{mentor.message}"
+                      </p>
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
-          </div>
+          ))}
         </div>
       </div>
     </section>
@@ -268,18 +294,18 @@ function AchievementSection() {
       date: "October 2024",
       icon: "🧮"
     },
-    {
-      title: "Member Milestone",
-      description: "Reached 100+ active members within the first month of operation.",
-      date: "October 2024",
-      icon: "👥"
-    },
-    {
-      title: "University Recognition",
-      description: "Received official recognition and support from the Mathematics Department.",
-      date: "September 2024",
-      icon: "🏛️"
-    }
+    // {
+    //   title: "Member Milestone",
+    //   description: "Reached 100+ active members within the first month of operation.",
+    //   date: "October 2024",
+    //   icon: "👥"
+    // },
+    // {
+    //   title: "University Recognition",
+    //   description: "Received official recognition and support from the Mathematics Department.",
+    //   date: "September 2024",
+    //   icon: "🏛️"
+    // }
   ];
 
   return (

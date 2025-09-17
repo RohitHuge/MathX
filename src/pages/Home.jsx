@@ -520,7 +520,7 @@ function UpcomingEvents() {
     {
       id: 1,
       title: "MathX Inauguration",
-      date: "25th September 2024",
+      date: "25th September 2025",
       time: "10:00 AM",
       description: "Join us for the grand opening of MathX Club with special guest speakers, interactive sessions, and networking opportunities.",
       highlight: "🎉 Grand Opening Event",
@@ -528,11 +528,11 @@ function UpcomingEvents() {
     },
     {
       id: 2,
-      title: "MATHS Premier League",
-      date: "Coming Soon",
+      title: "Weekly Online Quiz",
+      date: "26th September 2025 onwards(Every Saturday)",
       time: "TBA",
-      description: "A fun auction of brilliant minds in mathematics. Competiting with each other to win the title of Maths Premier League.",
-      highlight: "🏆 Put your bid for best Maths minds",
+      description: "Test your mathematical skills in our weekly online quiz competition. Challenge yourself and compete with peers.",
+      highlight: "Get Certificate Instantly",
       status: "upcoming"
     },
     {

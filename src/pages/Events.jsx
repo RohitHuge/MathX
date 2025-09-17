@@ -164,7 +164,7 @@ function EventsGrid() {
     {
       id: 2,
       title: "MathX Inauguration",
-      date: "25th September 2024",
+      date: "25th September 2025",
       time: "10:00 AM",
       description: "Join us for the grand opening of MathX Club with special guest speakers, interactive sessions, and networking opportunities.",
       highlight: "🎉 Grand Opening Event",
@@ -173,7 +173,7 @@ function EventsGrid() {
     {
       id: 3,
       title: "Weekly Online Quiz",
-      date: "Every Saturday",
+      date: "26th September 2025 onwards(Every Saturday)",
       time: "2:00 PM",
       description: "Test your mathematical skills in our weekly online quiz competition. Challenge yourself and compete with peers.",
       highlight: "Get Certificate Instantly",

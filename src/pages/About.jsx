@@ -141,74 +141,158 @@ function MentorSection() {
 
 // Core Team Section Component
 function CoreTeamSection() {
-  const teamMembers = [
+  const [activeTeamIndex, setActiveTeamIndex] = React.useState(0);
+  const [isHovered, setIsHovered] = React.useState(false);
+  const [isTransitioning, setIsTransitioning] = React.useState(false);
+
+  const teams = [
     {
-      name: "Sarah Johnson",
-      role: "President",
-      tagline: "Fav: Euler's Identity",
-      emoji: "👑"
+      name: "Tech",
+      members: [
+        { name: "Rohit H.", role: "SE COMP", tagline: "Backend Wizard", emoji: "🖥️" },
+        { name: "Viraj R.", role: "SE COMP", tagline: "UI/UX Enthusiast", emoji: "🎛️" },
+        { name: "Veer S.", role: "SE COMP", tagline: "Algorithm Ace", emoji: "🧮" },
+        { name: "Om B.", role: "SE COMP", tagline: "Performance Tuner", emoji: "⚙️" },
+        { name: "Mayur R.", role: "SE COMP", tagline: "API Architect", emoji: "🔌" },
+        { name: "Priya K.", role: "SE COMP", tagline: "Code Reviewer", emoji: "📝" }
+      ]
     },
     {
-      name: "Michael Rodriguez",
-      role: "Vice President",
-      tagline: "Fav: Golden Ratio",
-      emoji: "⭐"
+      name: "Design",
+      members: [
+        { name: "Soham S.", role: "SE COMP", tagline: "Color Maestro", emoji: "🌈" },
+        { name: "Bipasha", role: "SE COMP", tagline: "Layout Virtuoso", emoji: "📐" },
+        { name: "Parth S.", role: "SE COMP", tagline: "Typography Fanatic", emoji: "🔤" },
+        { name: "Suyash S.", role: "SE COMP", tagline: "Minimalism Lover", emoji: "🧊" }
+      ]
     },
     {
-      name: "Emily Chen",
-      role: "Secretary",
-      tagline: "Fav: Pi (π)",
-      emoji: "📝"
+      name: "Execution",
+      members: [
+        { name: "Raj S.", role: "SE COMP", tagline: "Taskmaster", emoji: "🗂️" },
+        { name: "Rushikesh P.", role: "SE COMP", tagline: "Deadline Chaser", emoji: "⏰" },
+        { name: "Shraddha", role: "SE COMP", tagline: "Checklist Champion", emoji: "✅" },
+        { name: "Raj B.", role: "SE COMP", tagline: "Logistics Pro", emoji: "🚚" },
+        { name: "Prathamesh K.", role: "SE COMP", tagline: "Resource Handler", emoji: "📦" }
+      ]
     },
     {
-      name: "David Kim",
-      role: "Treasurer",
-      tagline: "Fav: Fibonacci Sequence",
-      emoji: "💰"
+      name: "Marketing",
+      members: [
+        { name: "Shivraj P.", role: "SE COMP", tagline: "Social Media Guru", emoji: "📱" },
+        { name: "Saloni S.", role: "SE COMP", tagline: "Brand Builder", emoji: "🏷️" },
+        { name: "Sakshi V.", role: "SE COMP", tagline: "Content Creator", emoji: "✒️" },
+        { name: "Harshada", role: "SE COMP", tagline: "Outreach Expert", emoji: "🌐" }
+      ]
     },
     {
-      name: "Lisa Wang",
-      role: "Events Coordinator",
-      tagline: "Fav: Prime Numbers",
-      emoji: "🎯"
+      name: "Question Making",
+      members: [
+        { name: "Shadab S.", role: "SE COMP", tagline: "Puzzle Crafter", emoji: "🧩" },
+        { name: "Sopan ", role: "SE COMP", tagline: "Theorem Hunter", emoji: "🔎" },
+        { name: "Aditya P.", role: "SE ENTC", tagline: "Sequence Specialist", emoji: "🔢" },
+        { name: "Anup ", role: "SE MECH", tagline: "Pattern Finder", emoji: "🔍" },
+        { name: "Mayur D.", role: "SE COMP", tagline: "Logic Designer", emoji: "🧠" },
+        { name: "Chaitanya P.", role: "SE COMP", tagline: "Quiz Master", emoji: "🏆" },
+        { name: "Khushi", role: "SE COMP", tagline: "Riddle Enthusiast", emoji: "🕵️" }
+      ]
     },
     {
-      name: "James Thompson",
-      role: "Public Relations",
-      tagline: "Fav: Complex Numbers",
-      emoji: "📢"
+      name: "Admin",
+      members: [
+        { name: "Krishna P.", role: "SE COMP", tagline: "Organizer-in-Chief", emoji: "📅" },
+        { name: "Rajat K.", role: "SE COMP", tagline: "Efficiency Expert"  , emoji: "⚡" },
+        { name: "Shravani J.", role: "SE COMP", tagline:"Finance Guru", emoji: "💸" },
+        { name: "Parth", role: "SE COMP", tagline: "Record Keeper", emoji: "🗃️" },
+        { name: "Vedant P.", role: "SE COMP", tagline: "Compliance Expert", emoji: "🛡️" },
+        { name: "Kushagra B.", role: "SE COMP", tagline: "Support Specialist", emoji: "🆘" }
+      ]
     }
   ];
 
+  // Auto-rotation effect
+  React.useEffect(() => {
+    if (isHovered || isTransitioning) return; // Pause on hover or during transitions
+
+    const interval = setInterval(() => {
+      setActiveTeamIndex((prevIndex) => (prevIndex + 1) % teams.length);
+    }, 4000);
+
+    return () => clearInterval(interval);
+  }, [isHovered, isTransitioning, teams.length]);
+
+  const handleTabClick = (index) => {
+    if (index === activeTeamIndex) return; // Don't switch if already active
+    
+    setIsTransitioning(true);
+    setActiveTeamIndex(index);
+    
+    // Reset transition state after animation completes
+    setTimeout(() => {
+      setIsTransitioning(false);
+    }, 500);
+  };
+
   return (
-    <section className="py-20 bg-[#191D2A]">
+    <section 
+      className="py-20 bg-[#191D2A]"
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
+    >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <h2 className="text-4xl md:text-5xl font-bold text-white text-center mb-16 animate-on-scroll" data-delay="100">
-           Team Members
+        <h2 className="text-4xl md:text-5xl font-bold text-white text-center mb-16">
+          Team Members
         </h2>
         
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {teamMembers.map((member, index) => (
-            <div key={index} className="group relative animate-on-scroll" data-delay={200 + (index * 100)}>
-              {/* Gradient Border */}
-              <div className="absolute inset-0 bg-gradient-to-r from-[#A146D4] to-[#49E3FF] rounded-xl opacity-0 group-hover:opacity-100 transition-opacity duration-500 blur-sm"></div>
-              
-              {/* Card Content */}
-              <div className="relative bg-[#191D2A] border border-[#A146D4]/30 rounded-xl p-6 group-hover:border-[#A146D4] transition-all duration-500 hover:shadow-lg hover:shadow-[#A146D4]/20 hover:scale-105 transform">
-                {/* Photo Placeholder */}
-                <div className="w-20 h-20 bg-gradient-to-br from-[#A146D4]/20 to-[#49E3FF]/20 rounded-full flex items-center justify-center border-2 border-[#A146D4]/30 mx-auto mb-4">
-                  <span className="text-3xl">{member.emoji}</span>
-                </div>
+        {/* Team Tabs */}
+        <div className="flex flex-wrap justify-center gap-4 mb-12">
+          {teams.map((team, index) => (
+            <button
+              key={index}
+              onClick={() => handleTabClick(index)}
+              className={`relative px-6 py-3 text-lg font-semibold text-white transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-[#A146D4]/50 rounded-lg ${
+                activeTeamIndex === index
+                  ? 'text-white'
+                  : 'text-[#AEAEAE] hover:text-white'
+              }`}
+            >
+              {team.name}
+              {/* Active tab gradient underline */}
+              {activeTeamIndex === index && (
+                <div className="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-[#A146D4] to-[#49E3FF] rounded-full"></div>
+              )}
+            </button>
+          ))}
+        </div>
+        
+        {/* Team Members Grid with Fade Animation */}
+        <div className="relative min-h-[400px] overflow-hidden">
+          <div 
+            key={activeTeamIndex}
+            className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8 animate-fade-in"
+          >
+            {teams[activeTeamIndex].members.map((member, index) => (
+              <div key={`${activeTeamIndex}-${index}`} className="group relative">
+                {/* Gradient Border */}
+                <div className="absolute inset-0 bg-gradient-to-r from-[#A146D4] to-[#49E3FF] rounded-xl opacity-0 group-hover:opacity-100 transition-opacity duration-500 blur-sm"></div>
                 
-                {/* Member Info */}
-                <div className="text-center">
-                  <h3 className="text-xl font-bold text-white mb-2">{member.name}</h3>
-                  {/* <p className="text-lg text-[#49E3FF] mb-3">{member.role}</p> */}
-                  <p className="text-sm text-[#AEAEAE] italic">{member.tagline}</p>
+                {/* Card Content */}
+                <div className="relative bg-[#191D2A] border border-[#A146D4]/30 rounded-xl p-6 group-hover:border-[#A146D4] transition-all duration-500 hover:shadow-lg hover:shadow-[#A146D4]/20 hover:scale-105 transform">
+                  {/* Photo Placeholder */}
+                  <div className="w-20 h-20 bg-gradient-to-br from-[#A146D4]/20 to-[#49E3FF]/20 rounded-full flex items-center justify-center border-2 border-[#A146D4]/30 mx-auto mb-4">
+                    <span className="text-3xl">{member.emoji}</span>
+                  </div>
+                  
+                  {/* Member Info */}
+                  <div className="text-center">
+                    <h3 className="text-xl font-bold text-white mb-2">{member.name}</h3>
+                    <p className="text-sm text-[#49E3FF] mb-2">{member.role}</p>
+                    <p className="text-sm text-[#AEAEAE] italic">{member.tagline}</p>
+                  </div>
                 </div>
               </div>
-            </div>
-          ))}
+            ))}
+          </div>
         </div>
       </div>
     </section>

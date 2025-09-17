@@ -198,7 +198,7 @@ function CoreTeamSection() {
       ]
     },
     {
-      name: "Admin",
+      name: "Core",
       members: [
         { name: "Krishna P.", role: "SE COMP", tagline: "Organizer-in-Chief", emoji: "📅" },
         { name: "Rajat P.", role: "SE COMP", tagline: "Efficiency Expert"  , emoji: "⚡" },
@@ -214,7 +214,7 @@ function CoreTeamSection() {
   React.useEffect(() => {
     if (isTransitioning) return; // Pause during transitions
 
-    const duration = 4000; // 4 seconds
+    const duration = 5000; // 4 seconds
     const interval = 50; // Update every 50ms for smooth progress
     let startTime = Date.now();
 

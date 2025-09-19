@@ -9,11 +9,11 @@ function ContactInfo() {
   const contactMethods = [
     {
       id: 1,
-      icon: "📧",
-      title: "Email",
-      value: "mathxpccoer@gmail.com",
-      link: "mailto:mathxpccoer@gmail.com",
-      description: "Send us an email for any inquiries"
+      icon: "💬",
+      title: "WhatsApp Community",
+      value: "Join Our Community",
+      link: "https://chat.whatsapp.com/IR5h08SJL3qDFjwvazgFA5?mode=ems_qr_t", // Replace with actual WhatsApp community link
+      description: "Join our WhatsApp community for instant updates and discussions"
     },
     {
       id: 2,
@@ -27,9 +27,9 @@ function ContactInfo() {
       id: 3,
       icon: "📍",
       title: "Location",
-      value: "Coming Soon",
-      link: null,
-      description: "Physical location details will be announced"
+      value: "Pimpri Chinchwad College Of Engineering & Research, Ravet, Pimpri-Chinchwad, Maharashtra 41210",
+      link: "https://maps.app.goo.gl/TZc4uUmnUPNzuhhr5",
+      description: "Trace our location on Google Maps"
     }
   ];
 
@@ -88,7 +88,7 @@ function ContactInfo() {
                 {method.link && (
                   <div className="mt-4">
                     <p className="text-[#49E3FF] text-sm opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                      Click to {method.title === 'Email' ? 'send email' : 'visit profile'}
+                      Click to {method.title === 'WhatsApp Community' ? 'join community' : method.title === 'Email' ? 'send email' : 'visit profile'}
                     </p>
                   </div>
                 )}

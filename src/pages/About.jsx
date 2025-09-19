@@ -203,7 +203,7 @@ function CoreTeamSection() {
         { name: "Krishna P.", role: "SE COMP", tagline: "Organizer-in-Chief", emoji: "📅" },
         { name: "Rajat P.", role: "SE COMP", tagline: "Efficiency Expert"  , emoji: "⚡" },
         { name: "Shravani J.", role: "SE COMP", tagline:"Finance Guru", emoji: "💸" },
-        { name: "Parth", role: "SE COMP", tagline: "Record Keeper", emoji: "🗃️" },
+        { name: "Pawan S.", role: "SE COMP", tagline: "Record Keeper", emoji: "🗃️" },
         { name: "Vedant P.", role: "SE COMP", tagline: "Compliance Expert", emoji: "🛡️" },
         { name: "Kushagra B.", role: "SE COMP", tagline: "Support Specialist", emoji: "🆘" }
       ]
@@ -214,7 +214,7 @@ function CoreTeamSection() {
   React.useEffect(() => {
     if (isTransitioning) return; // Pause during transitions
 
-    const duration = 5000; // 4 seconds
+    const duration = 10000; // 10 seconds
     const interval = 50; // Update every 50ms for smooth progress
     let startTime = Date.now();
 

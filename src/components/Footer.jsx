@@ -123,7 +123,7 @@ const Footer = () => {
           <div className="flex flex-col md:flex-row justify-between items-center">
             <div className="text-center md:text-left mb-4 md:mb-0">
               <p className="text-white/90 text-sm">
-                © 2024 MathX Club. All rights reserved.
+                © 2025 MathX Club. All rights reserved.
               </p>
               <p className="text-white/70 text-xs mt-1">
                 Empowering mathematical minds, one equation at a time.

@@ -657,19 +657,19 @@ function QuickStats() {
   const stats = [
     {
       label: "Members",
-      count: counts.members,
+      count: 30,
       icon: "👥",
       color: "from-[#A146D4] to-[#49E3FF]"
     },
     {
       label: "Events Planned",
-      count: counts.events,
+      count: 5,
       icon: "📅",
       color: "from-[#49E3FF] to-[#A146D4]"
     },
     {
       label: "Quizzes Hosted",
-      count: counts.quizzes,
+      count: 10,
       icon: "🧮",
       color: "from-[#A146D4] to-[#49E3FF]"
     }

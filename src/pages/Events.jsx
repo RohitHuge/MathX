@@ -173,7 +173,7 @@ function EventsGrid() {
     {
       id: 3,
       title: "Weekly Online Quiz",
-      date: "26th September 2025 onwards(Every Saturday)",
+      date: "26th September 2025 onwards(Every Thursday)",
       time: "2:00 PM",
       description: "Test your mathematical skills in our weekly online quiz competition. Challenge yourself and compete with peers.",
       highlight: "Get Certificate Instantly",
@@ -181,7 +181,7 @@ function EventsGrid() {
     },
     {
       id: 4,
-      title: "MATHS Premier League",
+      title: "Maths Premier League",
       date: "Coming Soon",
       time: "TBA",
       description: "A fun auction of brilliant minds in mathematics. Competiting with each other to win the title of Maths Premier League.",

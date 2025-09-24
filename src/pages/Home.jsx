@@ -529,7 +529,7 @@ function UpcomingEvents() {
     {
       id: 2,
       title: "Weekly Online Quiz",
-      date: "26th September 2025 onwards(Every Saturday)",
+      date: "26th September 2025 onwards(Every Thursday)",
       time: "TBA",
       description: "Test your mathematical skills in our weekly online quiz competition. Challenge yourself and compete with peers.",
       highlight: "Get Certificate Instantly",

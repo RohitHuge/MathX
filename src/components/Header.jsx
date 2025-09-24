@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
+import logo from '../assets/logo.png';
 
 const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -38,9 +39,11 @@ const Header = () => {
         <div className="flex justify-between items-center py-4">
           {/* Logo */}
           <Link to="/" className="flex items-center space-x-2 group cursor-pointer transition-all duration-300 hover:scale-105">
-            <div className="w-10 h-10 bg-gradient-to-br from-[#A146D4]/80 to-[#49E3FF]/80 rounded-lg flex items-center justify-center">
-              <span className="text-white font-bold text-xl">M</span>
-            </div>
+            <img 
+              src={logo} 
+              alt="MathX Logo" 
+              className="w-10 h-10 object-cover scale-150"
+            />
             <span className="text-white font-bold text-2xl bg-gradient-to-br from-[#A146D4]/80 to-[#49E3FF]/80 bg-clip-text text-transparent">
               MathX
             </span>

@@ -210,28 +210,28 @@ function CoreTeamSection() {
     }
   ];
 
-  // Auto-rotation effect with progress bar
-  React.useEffect(() => {
-    if (isTransitioning) return; // Pause during transitions
+  // Auto-rotation effect with progress bar - PAUSED
+  // React.useEffect(() => {
+  //   if (isTransitioning) return; // Pause during transitions
 
-    const duration = 10000; // 10 seconds
-    const interval = 50; // Update every 50ms for smooth progress
-    let startTime = Date.now();
+  //   const duration = 10000; // 10 seconds
+  //   const interval = 50; // Update every 50ms for smooth progress
+  //   let startTime = Date.now();
 
-    const progressInterval = setInterval(() => {
-      const elapsed = Date.now() - startTime;
-      const progressPercent = Math.min((elapsed / duration) * 100, 100);
-      setProgress(progressPercent);
+  //   const progressInterval = setInterval(() => {
+  //     const elapsed = Date.now() - startTime;
+  //     const progressPercent = Math.min((elapsed / duration) * 100, 100);
+  //     setProgress(progressPercent);
 
-      if (elapsed >= duration) {
-        setActiveTeamIndex((prevIndex) => (prevIndex + 1) % teams.length);
-        setProgress(0);
-        startTime = Date.now();
-      }
-    }, interval);
+  //     if (elapsed >= duration) {
+  //       setActiveTeamIndex((prevIndex) => (prevIndex + 1) % teams.length);
+  //       setProgress(0);
+  //       startTime = Date.now();
+  //     }
+  //   }, interval);
 
-    return () => clearInterval(progressInterval);
-  }, [activeTeamIndex, isTransitioning, teams.length]);
+  //   return () => clearInterval(progressInterval);
+  // }, [activeTeamIndex, isTransitioning, teams.length]);
 
   const handleTabClick = (index) => {
     if (index === activeTeamIndex) return; // Don't switch if already active
@@ -274,15 +274,15 @@ function CoreTeamSection() {
           ))}
         </div>
         
-        {/* Progress Bar */}
-        <div className="max-w-md mx-auto mb-12">
+        {/* Progress Bar - COMMENTED OUT */}
+        {/* <div className="max-w-md mx-auto mb-12">
           <div className="w-full bg-[#AEAEAE]/20 rounded-full h-1 overflow-hidden">
             <div 
               className="h-full bg-gradient-to-r from-[#A146D4] to-[#49E3FF] rounded-full transition-all duration-75 ease-linear"
               style={{ width: `${progress}%` }}
             ></div>
           </div>
-        </div>
+        </div> */}
         
         {/* Team Members Grid with Fade Animation */}
         <div className="relative min-h-[400px] overflow-hidden">
@@ -306,7 +306,7 @@ function CoreTeamSection() {
                   <div className="text-center">
                     <h3 className="text-xl font-bold text-white mb-2">{member.name}</h3>
                     <p className="text-sm text-[#49E3FF] mb-2">{member.role}</p>
-                    <p className="text-sm text-[#AEAEAE] italic">{member.tagline}</p>
+                    {/* <p className="text-sm text-[#AEAEAE] italic">{member.tagline}</p> */}
                   </div>
                 </div>
               </div>

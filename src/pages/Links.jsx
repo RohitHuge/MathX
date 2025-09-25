@@ -10,7 +10,7 @@ const LinksPage = () => {
   });
 
   // Set target date for countdown: September 25, 2025 at 3 PM
-  const targetDate = new Date('2025-09-25T15:00:00');
+  const targetDate = new Date('2025-10-01T12:00:00');
 
   useEffect(() => {
     const timer = setInterval(() => {

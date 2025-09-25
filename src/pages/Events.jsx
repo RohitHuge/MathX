@@ -164,8 +164,8 @@ function EventsGrid() {
     {
       id: 2,
       title: "MathX Inauguration",
-      date: "25th September 2025",
-      time: "10:00 AM",
+      date: "1st October 2025",
+      time: "12:00 PM",
       description: "Join us for the grand opening of MathX Club with special guest speakers, interactive sessions, and networking opportunities.",
       highlight: "🎉 Grand Opening Event",
       status: "upcoming"
@@ -173,8 +173,8 @@ function EventsGrid() {
     {
       id: 3,
       title: "Weekly Online Quiz",
-      date: "26th September 2025 onwards(Every Thursday)",
-      time: "2:00 PM",
+      date: "2st October 2025 onwards(Every Thursday)",
+      time: "TBA",
       description: "Test your mathematical skills in our weekly online quiz competition. Challenge yourself and compete with peers.",
       highlight: "Get Certificate Instantly",
       status: "upcoming"
@@ -336,19 +336,19 @@ function UpcomingHighlight() {
             MathX Inauguration
           </h3>
           <p className="text-xl text-[#AEAEAE] mb-6">
-            Join us for the grand opening of MathX Club on <span className="text-[#49E3FF] font-semibold">25th September 2024</span>
+            Join us for the grand opening of MathX Club on <span className="text-[#49E3FF] font-semibold">1st October 2025</span>
           </p>
           <p className="text-lg text-[#AEAEAE] mb-8 leading-relaxed">
             Special guest speakers, interactive sessions, networking opportunities, and much more await you at this historic event.
           </p>
           
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <button className="bg-[#49E3FF]/80 text-[#191D2A] px-8 py-3 rounded-lg font-semibold hover:shadow-lg hover:shadow-[#49E3FF]/25 transition-all duration-300 hover:scale-105 transform">
+            {/* <button className="bg-[#49E3FF]/80 text-[#191D2A] px-8 py-3 rounded-lg font-semibold hover:shadow-lg hover:shadow-[#49E3FF]/25 transition-all duration-300 hover:scale-105 transform">
               Register Now
             </button>
             <button className="border-2 border-[#A146D4]/80 text-[#A146D4] px-8 py-3 rounded-lg font-semibold hover:bg-[#A146D4] hover:text-white transition-all duration-300 hover:scale-105 transform">
               Learn More
-            </button>
+            </button> */}
           </div>
         </div>
       </div>

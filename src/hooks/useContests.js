@@ -6,7 +6,7 @@ const mockContests = [
     id: 1,
     title: "Weekly Math Challenge",
     description: "Test your mathematical skills with our weekly challenge featuring algebra, geometry, and calculus problems.",
-    start_time: new Date('2025-09-25T03:10:00').toISOString(), // September 25, 2025 at 3:10 AM
+    start_time: new Date('2025-09-25T16:10:00').toISOString(), // September 25, 2025 at 3:10 AM
     duration: "60 minutes",
     question_count: "25 MCQs",
     participant_count: 156,

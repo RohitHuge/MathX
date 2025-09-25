@@ -1,7 +1,9 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
+import { useNavigate } from 'react-router-dom';
 import logo from '../assets/logo.png';
 
 const LinksPage = () => {
+  const navigate = useNavigate();
   const [timeLeft, setTimeLeft] = useState({
     days: 0,
     hours: 0,
@@ -9,27 +11,46 @@ const LinksPage = () => {
     seconds: 0
   });
 
-  // Set target date for countdown: September 25, 2025 at 3 PM
-  const targetDate = new Date('2025-09-25T15:00:00');
+
+  // Set target date for countdown: October 1, 2025 at 3 PM
+  const targetDate = useMemo(() => {
+    return new Date('2025-10-01T15:00:00');
+  }, []); // Only calculate once when component mounts
 
   useEffect(() => {
-    const timer = setInterval(() => {
+    // Initial calculation
+    const calculateTimeLeft = () => {
       const now = new Date().getTime();
       const distance = targetDate.getTime() - now;
 
       if (distance > 0) {
-        setTimeLeft({
+        const newTimeLeft = {
           days: Math.floor(distance / (1000 * 60 * 60 * 24)),
           hours: Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60)),
           minutes: Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60)),
           seconds: Math.floor((distance % (1000 * 60)) / 1000)
-        });
+        };
+        setTimeLeft(newTimeLeft);
+        return true;
       } else {
         setTimeLeft({ days: 0, hours: 0, minutes: 0, seconds: 0 });
+        return false;
+      }
+    };
+    
+    // Set initial time
+    calculateTimeLeft();
+    
+    const timer = setInterval(() => {
+      const shouldContinue = calculateTimeLeft();
+      if (!shouldContinue) {
+        clearInterval(timer);
       }
     }, 1000);
 
-    return () => clearInterval(timer);
+    return () => {
+      clearInterval(timer);
+    };
   }, [targetDate]);
 
   const CountdownSection = () => (
@@ -111,7 +132,21 @@ const LinksPage = () => {
       </svg>
     );
 
+    const RegistrationIcon = () => (
+      <svg className="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 24 24">
+        <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-7 3c1.93 0 3.5 1.57 3.5 3.5S13.93 13 12 13s-3.5-1.57-3.5-3.5S10.07 6 12 6zm7 13H5v-.23c0-.62.28-1.2.76-1.58C7.47 15.82 9.64 15 12 15s4.53.82 6.24 2.19c.48.38.76.97.76 1.58V19z"/>
+      </svg>
+    );
+
     const links = [
+      {
+        icon: RegistrationIcon,
+        title: "Registration",
+        description: "Register for MathX Club membership",
+        url: "#",
+        color: "from-purple-500 to-indigo-500",
+        isRegistration: true
+      },
       {
         icon: MessageIcon,
         title: "Join our WhatsApp Community",
@@ -135,15 +170,21 @@ const LinksPage = () => {
       }
     ];
 
+    const handleLinkClick = (link) => {
+      if (link.isRegistration) {
+        navigate('/registration');
+      } else {
+        window.open(link.url, '_blank', 'noopener,noreferrer');
+      }
+    };
+
     return (
       <div className="w-full max-w-sm mx-auto space-y-4">
         {links.map((link, index) => (
-          <a
+          <div
             key={index}
-            href={link.url}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="block group focus:outline-none focus:ring-2 focus:ring-cyan-400 focus:ring-opacity-50 rounded-xl"
+            onClick={() => handleLinkClick(link)}
+            className="block group focus:outline-none focus:ring-2 focus:ring-cyan-400 focus:ring-opacity-50 rounded-xl cursor-pointer"
           >
             <div 
               className="relative p-4 rounded-xl transition-all duration-300 group-hover:scale-105 group-active:scale-95"
@@ -175,11 +216,12 @@ const LinksPage = () => {
               {/* Hover Glow Effect */}
               <div className="absolute inset-0 rounded-xl bg-gradient-to-r from-[#A146D4] to-[#49E3FF] opacity-0 group-hover:opacity-10 transition-opacity duration-300" />
             </div>
-          </a>
+          </div>
         ))}
       </div>
     );
   };
+
 
   return (
     <div 

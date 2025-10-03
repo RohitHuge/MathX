@@ -1,0 +1,67 @@
+{
+  "currentEvent": {
+    "id": "mathx-contest-01",
+    "title": "MathX Contest ",
+    "description": "Join us for the first MathX Contest",
+    "startTime": "2025-10-09T12:00:00.000Z",
+    "endTime": "2025-10-10T00:00:00.000Z",
+    "duration": "12 hours",
+    "location": "Online Event",
+    "registrationUrl": "/registration",
+    "isActive": true,
+    "theme": {
+      "primaryColor": "#A146D4",
+      "secondaryColor": "#49E3FF",
+      "backgroundColor": "rgba(161, 70, 212, 0.65)"
+    },
+    "links": [
+      {
+        "type": "registration",
+        "title": "Register Now",
+        "description": "Secure yur spot to get a opportunity be a part",
+        "url": "/registration",
+        "color": "from-purple-500 to-indigo-500",
+        "isRegistration": true
+      },
+      {
+        "type": "whatsapp",
+        "title": "Join WhatsApp Group",
+        "description": "Get real-time updates and connect with participants",
+        "url": "https://chat.whatsapp.com/IR5h08SJL3qDFjwvazgFA5?mode=ems_qr_t",
+        "color": "from-green-500 to-green-400"
+      },
+      {
+        "type": "instagram",
+        "title": "Follow on Instagram",
+        "description": "Daily math tips and event updates",
+        "url": "https://instagram.com/mathxpccoer",
+        "color": "from-pink-500 to-purple-500"
+      },
+      {
+        "type": "website",
+        "title": "Visit MathX Website",
+        "description": "Explore our full platform and resources",
+        "url": "https://mathxpccoer.pages.dev",
+        "color": "from-blue-500 to-cyan-400"
+      }
+    ]
+  },
+  "upcomingEvents": [
+    {
+      "id": "mathx-workshop-2025",
+      "title": "Advanced Math Workshop",
+      "description": "Deep dive into calculus and linear algebra",
+      "startTime": "2025-11-15T14:00:00.000Z",
+      "endTime": "2025-11-15T17:00:00.000Z",
+      "duration": "3 hours",
+      "location": "Online Workshop",
+      "registrationUrl": "/registration",
+      "isActive": false,
+      "theme": {
+        "primaryColor": "#49E3FF",
+        "secondaryColor": "#A146D4",
+        "backgroundColor": "rgba(73, 227, 255, 0.65)"
+      }
+    }
+  ]
+}

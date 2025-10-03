@@ -12,10 +12,12 @@ const LinksPage = () => {
   });
 
 
+
   // Set target date for countdown: October 1, 2025 at 3 PM
   const targetDate = useMemo(() => {
     return new Date('2025-10-01T15:00:00');
   }, []); // Only calculate once when component mounts
+
 
   useEffect(() => {
     // Initial calculation

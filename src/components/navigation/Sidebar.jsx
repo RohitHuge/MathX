@@ -71,7 +71,7 @@ const Sidebar = () => {
       await logout();
       setShowProfileDropdown(false);
       setIsOpen(false);
-      navigate('/');
+      navigate('/contest');
     } catch (error) {
       console.error('Logout failed:', error);
     }

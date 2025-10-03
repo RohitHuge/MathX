@@ -12,7 +12,8 @@ const AuthPage = () => {
     name: '',
     email: '',
     password: '',
-    rollno: ''
+    rollno: '',
+    phone: ''
   });
   const [errors, setErrors] = useState({});
   const [toast, setToast] = useState({ isVisible: false, type: 'success', message: '' });
@@ -41,6 +42,10 @@ const AuthPage = () => {
       newErrors.rollno = 'Roll number is required';
     }
 
+    if (activeTab === 'register' && !formData.phone.trim()) {
+      newErrors.phone = 'Phone number is required';
+    }
+
     if (!formData.email.trim()) {
       newErrors.email = 'Email is required';
     } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
@@ -66,11 +71,16 @@ const AuthPage = () => {
       if (activeTab === 'login') {
         await login(formData.email, formData.password);
         showToast('success', 'Welcome back! Redirecting to dashboard...');
-        setTimeout(() => navigate('/dashboard'), 1500);
+        setTimeout(() => navigate('/contest'), 1500);
       } else {
-        await register(formData.name, formData.email, formData.password);
+        
+       const  res = await register(formData.name, formData.email, formData.password, formData.phone, formData.rollno);
+        if (res.success) {
         showToast('success', 'Account created successfully! Welcome to MathX!');
-        setTimeout(() => navigate('/dashboard'), 1500);
+          setTimeout(() => navigate('/contest'), 1500);
+        } else {
+          showErrorModal('Registration Error', res.message);
+        }
       }
     } catch (error) {
       showErrorModal('Authentication Error', error.message);
@@ -228,6 +238,31 @@ const AuthPage = () => {
                   />
                   {errors.rollno && (
                     <p className="mt-1 text-sm text-red-400">{errors.rollno}</p>
+                  )}
+                </div>
+              )}
+
+              {/* Phone Number (Register only) */}
+
+              {activeTab === 'register' && (
+                <div>
+                  <label htmlFor="phone" className="block text-sm font-medium text-white mb-2">
+                    Phone Number
+                  </label>
+                  <input
+                    type="text"
+                    id="phone"
+                    name="phone"
+                    value={formData.phone}
+                    onChange={handleInputChange}
+
+                    className={`w-full px-4 py-3 bg-white/10 border rounded-lg text-white placeholder-[#AEAEAE] focus:outline-none focus:ring-2 focus:ring-[#A146D4] transition-all duration-200 ${
+                      errors.phone ? 'border-red-500' : 'border-white/20'
+                    }`}
+                    placeholder="Enter your phone number (10 digits)"
+                  />
+                  {errors.phone && (
+                    <p className="mt-1 text-sm text-red-400">{errors.phone}</p>
                   )}
                 </div>
               )}

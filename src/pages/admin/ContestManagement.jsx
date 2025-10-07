@@ -285,7 +285,7 @@ const ContestManagement = () => {
           {
             title: contestData.title,
             description: contestData.description,
-            startTime: contestData.startTime,
+            startTime: new Date(contestData.startTime).toISOString(),
             eventDuration: contestData.eventDuration,
             contestDuration: contestData.contestDuration,
             status: contestData.status,
@@ -314,7 +314,7 @@ const ContestManagement = () => {
           {
             title: contestData.title,
             description: contestData.description,
-            startTime: contestData.startTime,
+            startTime: new Date(contestData.startTime).toISOString(),
             eventDuration: contestData.eventDuration,
             contestDuration: contestData.contestDuration,
             status: contestData.status,

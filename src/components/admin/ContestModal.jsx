@@ -25,7 +25,7 @@ const ContestModal = ({ isOpen, onClose, onSave, contest }) => {
       setFormData({
         title: contest.title || '',
         description: contest.description || '',
-        startTime: contest.startTime ? new Date(contest.startTime).toISOString().slice(0, 16) : '',
+        startTime: contest.startTime ? new Date(contest.startTime).toLocaleString('sv-SE').slice(0, 16) : '',
         eventDuration: contest.eventDuration || 60,
         contestDuration: contest.contestDuration || 30,
         difficulty: contest.difficulty || 'medium',

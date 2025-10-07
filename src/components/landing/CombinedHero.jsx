@@ -1,9 +1,17 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'motion/react';
 import { useNavigate } from 'react-router-dom';
+import { Client, Databases, Query } from 'appwrite';
+import { appwriteEndpoint, appwriteProjectId, appwriteDatabaseId } from '../../../config.js';
+
+// Appwrite configuration
+const client = new Client()
+  .setEndpoint(appwriteEndpoint)
+  .setProject(appwriteProjectId);
+
+const databases = new Databases(client);
 
 const CombinedHero = ({ 
-  contest, 
   leaderboard, 
   isLoggedIn, 
   onRegister, 
@@ -12,6 +20,8 @@ const CombinedHero = ({
   onViewFullLeaderboard 
 }) => {
   const navigate = useNavigate();
+  const [contest, setContest] = useState(null);
+  const [loading, setLoading] = useState(true);
   const [timeLeft, setTimeLeft] = useState({
     days: 0,
     hours: 0,
@@ -25,6 +35,55 @@ const CombinedHero = ({
     minutes: 0,
     seconds: 0
   });
+
+  // Fetch featured contest from Appwrite
+  useEffect(() => {
+    const fetchFeaturedContest = async () => {
+      try {
+        setLoading(true);
+        
+        // Fetch contest with showInLanding: true
+        const response = await databases.listDocuments(
+          appwriteDatabaseId,
+          'contest_info',
+          [
+            Query.equal('showInLanding', true),
+            Query.limit(1),
+            Query.orderDesc('$createdAt')
+          ]
+        );
+
+        if (response.documents.length > 0) {
+          const featuredContest = response.documents[0];
+          setContest({
+            id: featuredContest.$id,
+            title: featuredContest.title,
+            description: featuredContest.description,
+            start_time: featuredContest.startTime,
+            duration: `${featuredContest.eventDuration} min`,
+            question_count: featuredContest.questionCount,
+            status: featuredContest.status,
+            difficulty: featuredContest.difficulty,
+            price: featuredContest.price
+          });
+        } else {
+          setContest(null);
+        }
+      } catch (error) {
+        console.error('Error fetching featured contest:', error);
+        setContest(null);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchFeaturedContest();
+
+    // Refresh featured contest every 30 seconds
+    const refreshInterval = setInterval(fetchFeaturedContest, 30000);
+    
+    return () => clearInterval(refreshInterval);
+  }, []);
 
   // Countdown timer logic
   useEffect(() => {
@@ -199,7 +258,7 @@ const CombinedHero = ({
             </motion.div>
           </motion.div>
 
-          {/* Center Column - Upcoming Contest */}
+          {/* Center Column - Featured Contest */}
           <motion.div 
             id="upcoming-contest"
             className="md:col-span-1 lg:col-span-1 h-[28rem] sm:h-[32rem] mb-6 lg:mb-0"
@@ -207,7 +266,15 @@ const CombinedHero = ({
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.3 }}
           >
-            {contest ? (
+            {loading ? (
+              <div className="bg-gradient-to-br from-[#A146D4]/10 to-[#49E3FF]/10 border border-[#A146D4]/30 rounded-2xl p-6 backdrop-blur-sm">
+                <div className="animate-pulse">
+                  <div className="h-6 bg-[#A146D4]/20 rounded-lg w-3/4 mx-auto mb-3"></div>
+                  <div className="h-4 bg-[#A146D4]/20 rounded-lg w-full mb-4"></div>
+                  <div className="h-20 bg-[#A146D4]/20 rounded-lg w-full"></div>
+                </div>
+              </div>
+            ) : contest ? (
               <div className="relative bg-gradient-to-br from-[#A146D4]/10 to-[#49E3FF]/10 border border-[#A146D4]/30 rounded-2xl backdrop-blur-sm h-full overflow-hidden">
                 {/* Math Symbols Background */}
                 <div className="absolute inset-0 opacity-5">
@@ -322,12 +389,18 @@ const CombinedHero = ({
                 </div>
               </div>
             ) : (
-              <div className="bg-gradient-to-br from-[#A146D4]/10 to-[#49E3FF]/10 border border-[#A146D4]/30 rounded-2xl p-6 backdrop-blur-sm">
-                <div className="animate-pulse">
-                  <div className="h-6 bg-[#A146D4]/20 rounded-lg w-3/4 mx-auto mb-3"></div>
-                  <div className="h-4 bg-[#A146D4]/20 rounded-lg w-full mb-4"></div>
-                  <div className="h-20 bg-[#A146D4]/20 rounded-lg w-full"></div>
-                </div>
+              <div className="bg-gradient-to-br from-[#A146D4]/10 to-[#49E3FF]/10 border border-[#A146D4]/30 rounded-2xl p-6 backdrop-blur-sm h-full flex flex-col items-center justify-center text-center">
+                <div className="text-6xl mb-4">🏆</div>
+                <h3 className="text-xl font-bold text-white mb-2">No Featured Contest</h3>
+                <p className="text-[#AEAEAE] text-sm mb-6">
+                  No contest is currently featured on the landing page. Check back later for exciting math challenges!
+                </p>
+                <button
+                  onClick={onViewContests}
+                  className="bg-gradient-to-r from-[#A146D4] to-[#49E3FF] text-white px-6 py-2 rounded-lg font-semibold hover:shadow-lg hover:shadow-[#A146D4]/25 transition-all duration-300 hover:scale-105 transform"
+                >
+                  View All Contests
+                </button>
               </div>
             )}
           </motion.div>

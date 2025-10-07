@@ -10,6 +10,7 @@ import ContestLandingPage from './pages/contest/LandingPage'
 import AuthPage from './pages/contest/AuthPage'
 import Dashboard from './pages/contest/Dashboard'
 import ContestListPage from './pages/ContestListPage'
+import ContestPage from './pages/contest/ContestPage'
 import ContestLayout from './layouts/ContestLayout'
 import ContestManagement from './pages/admin/ContestManagement'
 import AdminRoute from './components/admin/AdminRoute'
@@ -33,16 +34,17 @@ function App() {
               <ContestLandingPage />
             </ContestLayout>
           } />
-          <Route path='/contests' element={
-            <ContestLayout>
-              <ContestListPage />
-            </ContestLayout>
-          } />
-          <Route path='/dashboard' element={
-            <ContestLayout>
-              <Dashboard />
-            </ContestLayout>
-          } />
+              <Route path='/contests' element={
+                <ContestLayout>
+                  <ContestListPage />
+                </ContestLayout>
+              } />
+              <Route path='/contest/:contestId' element={<ContestPage />} />
+              <Route path='/dashboard' element={
+                <ContestLayout>
+                  <Dashboard />
+                </ContestLayout>
+              } />
           <Route path='/admin' element={
             <ContestLayout>
               <AdminRoute>

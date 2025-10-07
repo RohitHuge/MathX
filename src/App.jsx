@@ -11,6 +11,8 @@ import AuthPage from './pages/contest/AuthPage'
 import Dashboard from './pages/contest/Dashboard'
 import ContestListPage from './pages/ContestListPage'
 import ContestLayout from './layouts/ContestLayout'
+import ContestManagement from './pages/admin/ContestManagement'
+import AdminRoute from './components/admin/AdminRoute'
 
 function App() {
   return (
@@ -39,6 +41,13 @@ function App() {
           <Route path='/dashboard' element={
             <ContestLayout>
               <Dashboard />
+            </ContestLayout>
+          } />
+          <Route path='/admin' element={
+            <ContestLayout>
+              <AdminRoute>
+                <ContestManagement />
+              </AdminRoute>
             </ContestLayout>
           } />
         </Routes>

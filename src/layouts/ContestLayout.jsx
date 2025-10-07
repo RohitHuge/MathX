@@ -14,9 +14,11 @@ import {
   Calendar,
   BarChart3,
   Menu,
-  X
+  X,
+  Shield
 } from 'lucide-react';
 import ContestModal from '../components/navigation/ContestModal';
+import { isUserAdmin } from '../utils/adminUtils';
 
 const ContestLayout = ({ children }) => {
   const [showProfileDropdown, setShowProfileDropdown] = useState(false);
@@ -83,6 +85,9 @@ const ContestLayout = ({ children }) => {
     }
   };
 
+  // Check if user has admin privileges
+  const isAdmin = isUserAdmin(user);
+
   const navItems = [
     {
       id: 'home',
@@ -112,12 +117,20 @@ const ContestLayout = ({ children }) => {
       path: '/leaderboard',
       action: () => navigate('/leaderboard')
     },
-    {
-      id: 'attempt',
-      label: 'Attempt Contest',
-      icon: Play,
-      action: handleAttemptContest
-    }
+    // Only show admin option for users with admin privileges
+    ...(isAdmin ? [{
+      id: 'admin',
+      label: 'Admin',
+      icon: Shield,
+      path: '/admin',
+      action: () => navigate('/admin')
+    }] : [])
+    // {
+    //   id: 'attempt',
+    //   label: 'Attempt Contest',
+    //   icon: Play,
+    //   action: handleAttemptContest
+    // }
   ];
 
   const getCurrentPath = () => {

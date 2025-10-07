@@ -7,12 +7,12 @@ const mockContests = [
     title: "Weekly Math Challenge",
     description: "Test your mathematical skills with our weekly challenge featuring algebra, geometry, and calculus problems.",
     start_time: new Date('2025-10-09T12:00:00').toISOString(), // September 25, 2025 at 3:10 AM
-    duration: "720 minutes",
-    question_count: "15 MCQs",
+    duration: "20 minutes",
+    question_count: "40 MCQs",
     participant_count: 156,
-    difficulty: "Intermediate",
+    difficulty: "Beginner",
     topics: ["Algebra", "Geometry", "Calculus"],
-    prize: "Certificate + $100",
+    prize: "Certificate",
     // status: "upcoming"
   },
   // {

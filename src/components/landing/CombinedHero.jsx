@@ -77,7 +77,7 @@ const CombinedHero = ({
 
   const getButtonText = () => {
     if (isLive) return "Start Contest";
-    if (isLoggedIn) return "Register Now";
+    if (isLoggedIn) return "Attempt Contest";
     return "Login to Participate";
   };
 

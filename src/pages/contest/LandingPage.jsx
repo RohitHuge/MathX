@@ -10,7 +10,7 @@ import LandingFooter from '../../components/landing/LandingFooter';
 import Loader from '../../components/landing/Loader';
 import ErrorModal from '../../components/landing/ErrorModal';
 import Toast from '../../components/landing/Toast';
-import Sidebar from '../../components/navigation/Sidebar';
+// Sidebar is now handled by ContestLayout
 
 // Import hooks
 import { useContests } from '../../hooks/useContests';
@@ -122,11 +122,8 @@ const contestLandingPage = () => {
 
   return (
     <div className="bg-[#191D2A] font-display min-h-screen">
-      {/* Sidebar Navigation */}
-      <Sidebar />
-      
       {/* Main Content Container */}
-      <div className="lg:ml-80 transition-all duration-300">
+      <div className="transition-all duration-300">
         {/* Global Loader */}
         {isLoading && (
           <Loader message="Loading contest data..." />

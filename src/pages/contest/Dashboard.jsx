@@ -32,12 +32,12 @@ const Dashboard = () => {
           
           <div className="space-y-4">
             <motion.button
-              onClick={() => navigate('/contest')}
+              onClick={() => navigate('/contests')}
               className="w-full bg-gradient-to-r from-[#A146D4] to-[#49E3FF] text-white py-3 px-4 rounded-lg font-medium hover:from-[#A146D4]/90 hover:to-[#49E3FF]/90 transition-all duration-200"
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.98 }}
             >
-              Go to Contest
+              View All Contests
             </motion.button>
             
             <motion.button

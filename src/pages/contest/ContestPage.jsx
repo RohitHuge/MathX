@@ -108,6 +108,7 @@ const ContestPage = () => {
   const [showContestInstructions, setShowContestInstructions] = useState(true);
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [toast, setToast] = useState({ show: false, message: '', type: 'info' });
+  const [showSubmitConfirm, setShowSubmitConfirm] = useState(false);
   
   const contestRef = useRef(null);
   const timerRef = useRef(null);
@@ -218,6 +219,14 @@ const ContestPage = () => {
       window.removeEventListener('resize', handleWindowResize);
     };
   }, [contestStarted, contestEnded]);
+
+  // Auto-submit when violations reach threshold (3)
+  useEffect(() => {
+    if (contestStarted && !contestEnded && violationCount >= 3) {
+      setShowWarning(false);
+      handleAutoSubmit();
+    }
+  }, [violationCount, contestStarted, contestEnded]);
 
   // Fetch contest and questions
   useEffect(() => {
@@ -409,8 +418,8 @@ const ContestPage = () => {
     }
   };
 
-  // Manual submit
-  const handleSubmit = async () => {
+  // Manual submit - invoked after confirmation
+  const handleConfirmSubmit = async () => {
     if (submitted) return;
     
     setContestEnded(true);
@@ -437,6 +446,12 @@ const ContestPage = () => {
     }
   };
 
+  // Open confirmation before manual submit
+  const handleSubmit = () => {
+    if (submitted) return;
+    setShowSubmitConfirm(true);
+  };
+
   // Handle refresh for pre-contest
   const handleRefresh = () => {
     window.location.reload();
@@ -453,8 +468,25 @@ const ContestPage = () => {
       await requestFullscreen();
       const now = new Date();
       
-      // Create score record (startContest will reuse existing open attempt)
-      const scoreRecord = await startContest(contestId, user.$id);
+      // Check existing attempt
+      let scoreRecord = await getUserContestScore(contestId, user.$id);
+      if (scoreRecord && scoreRecord.end_time) {
+        // Already submitted – jump to results
+        setContestEnded(true);
+        setSubmitted(true);
+        setScore({
+          totalScore: scoreRecord.score,
+          percentage: scoreRecord.score
+        });
+        setShowContestInstructions(false);
+        showToast('You have already submitted. Showing results.', 'info');
+        return;
+      }
+
+      // Create record if none; otherwise reuse existing open attempt
+      if (!scoreRecord) {
+        scoreRecord = await startContest(contestId, user.$id);
+      }
       if (!scoreRecord) {
         throw new Error('Failed to create score record');
       }
@@ -924,7 +956,7 @@ const ContestPage = () => {
           {/* Submit Button */}
           <div className="mt-4 lg:mt-8">
             <motion.button
-              onClick={handleSubmit}
+          onClick={handleSubmit}
               disabled={submitted}
               className="w-full bg-gradient-to-r from-[#A146D4] to-[#49E3FF] text-white py-2 lg:py-4 px-4 lg:px-8 rounded-lg lg:rounded-xl font-semibold text-sm lg:text-lg hover:shadow-xl transition-all duration-300 flex items-center justify-center space-x-2 disabled:opacity-50 disabled:cursor-not-allowed"
               whileHover={{ scale: 1.02 }}
@@ -969,6 +1001,39 @@ const ContestPage = () => {
                     className="bg-red-500 text-white px-6 py-2 rounded-lg font-semibold hover:bg-red-600 transition-all duration-300 w-full"
                   >
                     Exit Contest
+                  </button>
+                </div>
+              </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
+
+      {/* Submit confirmation modal */}
+      <AnimatePresence>
+        {showSubmitConfirm && (
+          <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+            <motion.div
+              className="bg-gradient-to-br from-[#A146D4]/10 to-[#49E3FF]/10 border border-[#A146D4]/30 rounded-2xl p-6 max-w-md w-full backdrop-blur-sm"
+              initial={{ opacity: 0, scale: 0.9 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.9 }}
+            >
+              <div className="text-center">
+                <h2 className="text-xl font-bold text-white mb-2">Submit Contest?</h2>
+                <p className="text-[#AEAEAE] mb-6">You won't be able to change answers after submitting.</p>
+                <div className="grid grid-cols-2 gap-3">
+                  <button
+                    onClick={() => setShowSubmitConfirm(false)}
+                    className="bg-white/10 text-white px-6 py-2 rounded-lg font-semibold hover:bg-white/20 transition-all duration-300"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    onClick={() => { setShowSubmitConfirm(false); handleConfirmSubmit(); }}
+                    className="bg-gradient-to-r from-[#A146D4] to-[#49E3FF] text-white px-6 py-2 rounded-lg font-semibold hover:shadow-lg transition-all duration-300"
+                  >
+                    Yes, Submit
                   </button>
                 </div>
               </div>

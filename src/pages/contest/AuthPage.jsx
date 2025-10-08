@@ -50,6 +50,8 @@ const AuthPage = () => {
       newErrors.email = 'Email is required';
     } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
       newErrors.email = 'Email is invalid';
+    } else if (activeTab === 'register' && !/^\S+@pccoer\.in$/i.test(formData.email)) {
+      newErrors.email = 'Please use your college email (@pccoer.in)';
     }
 
     if (!formData.password) {
@@ -281,7 +283,7 @@ const AuthPage = () => {
                   className={`w-full px-4 py-3 bg-white/10 border rounded-lg text-white placeholder-[#AEAEAE] focus:outline-none focus:ring-2 focus:ring-[#A146D4] transition-all duration-200 ${
                     errors.email ? 'border-red-500' : 'border-white/20'
                   }`}
-                  placeholder="Enter your email"
+                  placeholder={activeTab === 'register' ? 'Enter your college email (@pccoer.in)' : 'Enter your email'}
                 />
                 {errors.email && (
                   <p className="mt-1 text-sm text-red-400">{errors.email}</p>

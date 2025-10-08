@@ -105,7 +105,7 @@ const ContestPage = () => {
   
   // UI state
   const [showInstructions, setShowInstructions] = useState(false);
-  const [showContestInstructions, setShowContestInstructions] = useState(false);
+  const [showContestInstructions, setShowContestInstructions] = useState(true);
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [toast, setToast] = useState({ show: false, message: '', type: 'info' });
   
@@ -118,13 +118,26 @@ const ContestPage = () => {
     setTimeout(() => setToast({ show: false, message: '', type: 'info' }), 3000);
   };
 
-  // Request fullscreen
+  // Helpers
+  const getContestDurationMs = (durationMinutes) => {
+    const n = Number(durationMinutes);
+    return Number.isFinite(n) && n > 0 ? n * 60 * 1000 : 0;
+  };
+
+  // Request fullscreen (with vendor prefixes)
   const requestFullscreen = async () => {
     try {
-      if (document.documentElement.requestFullscreen) {
-        await document.documentElement.requestFullscreen();
+      const el = document.documentElement;
+      const req = el.requestFullscreen || el.webkitRequestFullscreen || el.mozRequestFullScreen || el.msRequestFullscreen;
+      if (req) {
+        const result = req.call(el);
+        if (result && typeof result.then === 'function') {
+          await result;
+        }
         setIsFullscreen(true);
         showToast('Fullscreen enabled. Contest is now secure.', 'success');
+      } else {
+        showToast('Fullscreen API not supported in this browser', 'warning');
       }
     } catch (error) {
       console.error('Fullscreen request failed:', error);
@@ -135,7 +148,7 @@ const ContestPage = () => {
   // Anti-cheating event listeners
   useEffect(() => {
     const handleFullscreenChange = () => {
-      const isCurrentlyFullscreen = document.fullscreenElement !== null;
+      const isCurrentlyFullscreen = !!(document.fullscreenElement || document.webkitFullscreenElement || document.mozFullScreenElement || document.msFullscreenElement);
       setIsFullscreen(isCurrentlyFullscreen);
       
       if (!isCurrentlyFullscreen && contestStarted && !contestEnded) {
@@ -172,17 +185,37 @@ const ContestPage = () => {
       showToast('Right-click is disabled during the contest', 'warning');
     };
 
+    // Fallback: detect exit from fullscreen by size changes
+    const handleWindowResize = () => {
+      const isCurrentlyFullscreen = !!(document.fullscreenElement || document.webkitFullscreenElement || document.mozFullScreenElement || document.msFullscreenElement);
+      const approxFull = Math.abs(window.innerHeight - screen.height) < 5 && Math.abs(window.innerWidth - screen.width) < 5;
+      if (!isCurrentlyFullscreen && !approxFull && contestStarted && !contestEnded) {
+        setIsFullscreen(false);
+        setViolationCount(prev => prev + 1);
+        setShowWarning(true);
+        showToast('Please return to fullscreen mode', 'warning');
+      }
+    };
+
     // Add event listeners
     document.addEventListener('fullscreenchange', handleFullscreenChange);
+    document.addEventListener('webkitfullscreenchange', handleFullscreenChange);
+    document.addEventListener('mozfullscreenchange', handleFullscreenChange);
+    document.addEventListener('MSFullscreenChange', handleFullscreenChange);
     document.addEventListener('visibilitychange', handleVisibilityChange);
     document.addEventListener('keydown', handleKeyDown);
     document.addEventListener('contextmenu', handleContextMenu);
+    window.addEventListener('resize', handleWindowResize);
 
     return () => {
       document.removeEventListener('fullscreenchange', handleFullscreenChange);
+      document.removeEventListener('webkitfullscreenchange', handleFullscreenChange);
+      document.removeEventListener('mozfullscreenchange', handleFullscreenChange);
+      document.removeEventListener('MSFullscreenChange', handleFullscreenChange);
       document.removeEventListener('visibilitychange', handleVisibilityChange);
       document.removeEventListener('keydown', handleKeyDown);
       document.removeEventListener('contextmenu', handleContextMenu);
+      window.removeEventListener('resize', handleWindowResize);
     };
   }, [contestStarted, contestEnded]);
 
@@ -213,7 +246,7 @@ const ContestPage = () => {
         // Check if contest has started
         const now = new Date();
         const startTime = new Date(contestResponse.startTime);
-        const contestDuration = contestResponse.contestDuration * 60 * 1000; // Convert to milliseconds
+        const contestDuration = getContestDurationMs(contestResponse.contestDuration);
         const endTime = new Date(startTime.getTime() + contestDuration);
         
         if (now < startTime) {
@@ -283,11 +316,14 @@ const ContestPage = () => {
 
   // Timer countdown
   useEffect(() => {
+    if (timerRef.current) {
+      clearInterval(timerRef.current);
+      timerRef.current = null;
+    }
     if (contestStarted && !contestEnded && timeRemaining > 0) {
       timerRef.current = setInterval(() => {
         setTimeRemaining(prev => {
           if (prev <= 1000) {
-            // Time's up - auto submit
             handleAutoSubmit();
             return 0;
           }
@@ -295,13 +331,13 @@ const ContestPage = () => {
         });
       }, 1000);
     }
-
     return () => {
       if (timerRef.current) {
         clearInterval(timerRef.current);
+        timerRef.current = null;
       }
     };
-  }, [contestStarted, contestEnded]);
+  }, [contestStarted, contestEnded, timeRemaining]);
 
   // Format time remaining
   const formatTime = (milliseconds) => {
@@ -417,18 +453,21 @@ const ContestPage = () => {
       await requestFullscreen();
       const now = new Date();
       
-      // Create score record
+      // Create score record (startContest will reuse existing open attempt)
       const scoreRecord = await startContest(contestId, user.$id);
       if (!scoreRecord) {
         throw new Error('Failed to create score record');
       }
       
-      setContestStarted(true);
-      setStartTime(now);
-      // Initialize timer for new attempts
-      if (contest && typeof contest.contestDuration === 'number') {
-        setTimeRemaining(Math.max(0, contest.contestDuration * 60 * 1000));
+      // Initialize or resume timer from recorded start_time BEFORE flipping started flag
+      const durationMs = contest ? getContestDurationMs(contest.contestDuration) : 0;
+      if (durationMs > 0) {
+        const startedAt = scoreRecord.start_time ? new Date(scoreRecord.start_time) : now;
+        const elapsed = now - startedAt;
+        setTimeRemaining(Math.max(0, durationMs - elapsed));
       }
+      setStartTime(now);
+      setContestStarted(true);
       setShowContestInstructions(false);
     } catch (error) {
       console.error('Error starting contest:', error);

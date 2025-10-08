@@ -45,6 +45,11 @@ export const useContestScore = () => {
       setLoading(true);
       setError(null);
 
+      const existingScore = await getUserContestScore(contestId, userId);
+      if (existingScore) {
+        throw new Error('Contest already started');
+      }
+
       const { data, error } = await supabase
         .from('scores')
         .insert([

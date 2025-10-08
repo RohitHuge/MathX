@@ -1,118 +1,189 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import logo from '../assets/logo.png';
+import { useEventData } from '../hooks/useEventData';
 
 const LinksPage = () => {
   const navigate = useNavigate();
+  const { currentEvent, loading, getEventStatus, getTimeUntilEvent, getTimeUntilEventEnd } = useEventData();
+  
   const [timeLeft, setTimeLeft] = useState({
     days: 0,
     hours: 0,
     minutes: 0,
     seconds: 0
   });
-
-
-
-  // Set target date for countdown: October 1, 2025 at 3 PM
-  const targetDate = useMemo(() => {
-    return new Date('2025-10-01T15:00:00');
-  }, []); // Only calculate once when component mounts
-
+  const [isLive, setIsLive] = useState(false);
 
   useEffect(() => {
-    // Initial calculation
-    const calculateTimeLeft = () => {
-      const now = new Date().getTime();
-      const distance = targetDate.getTime() - now;
+    if (!currentEvent) return;
 
-      if (distance > 0) {
-        const newTimeLeft = {
-          days: Math.floor(distance / (1000 * 60 * 60 * 24)),
-          hours: Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60)),
-          minutes: Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60)),
-          seconds: Math.floor((distance % (1000 * 60)) / 1000)
-        };
-        setTimeLeft(newTimeLeft);
-        return true;
+    const updateCountdown = () => {
+      const eventStatus = getEventStatus(currentEvent);
+      
+      if (eventStatus === 'upcoming') {
+        const timeUntil = getTimeUntilEvent(currentEvent);
+        if (timeUntil) {
+          setTimeLeft(timeUntil);
+          setIsLive(false);
+        }
+      } else if (eventStatus === 'live') {
+        const timeUntilEnd = getTimeUntilEventEnd(currentEvent);
+        if (timeUntilEnd) {
+          setTimeLeft(timeUntilEnd);
+          setIsLive(true);
+        }
       } else {
         setTimeLeft({ days: 0, hours: 0, minutes: 0, seconds: 0 });
-        return false;
+        setIsLive(false);
       }
     };
-    
-    // Set initial time
-    calculateTimeLeft();
-    
-    const timer = setInterval(() => {
-      const shouldContinue = calculateTimeLeft();
-      if (!shouldContinue) {
-        clearInterval(timer);
-      }
-    }, 1000);
 
-    return () => {
-      clearInterval(timer);
-    };
-  }, [targetDate]);
+    updateCountdown();
+    const timer = setInterval(updateCountdown, 1000);
 
-  const CountdownSection = () => (
-    <div className="w-full max-w-sm mx-auto mb-8">
-      {/* MATHX Header with Logo */}
-      <div className="text-center mb-6">
-        <div className="flex flex-col items-center space-y-3">
-          <img 
-            src={logo} 
-            alt="MathX Logo" 
-            className="w-16 h-16 object-cover scale-150"
-          />
-          <h1 className="text-3xl font-bold text-white tracking-wider">
-            MathX
-          </h1>
-        </div>
-      </div>
+    return () => clearInterval(timer);
+  }, [currentEvent, getEventStatus, getTimeUntilEvent, getTimeUntilEventEnd]);
 
-      {/* Countdown Banner */}
-      <div 
-        className="rounded-2xl p-6 text-center relative overflow-hidden"
-        style={{ backgroundColor: 'rgba(161, 70, 212, 0.65)' }}
-      >
-        <h2 className="text-lg font-semibold text-white mb-2">
-          MathX Club Inauguration
-        </h2>
-        <p className="text-sm text-gray-200 mb-4">
-          Join us for the grand opening of our math community
-        </p>
-        
-        {/* Countdown Timer */}
-        <div className="grid grid-cols-4 gap-2">
-          <div className="bg-black/30 rounded-lg p-2">
-            <div className="text-2xl font-bold text-cyan-400 drop-shadow-lg">
-              {timeLeft.days.toString().padStart(2, '0')}
+  const CountdownSection = () => {
+    if (loading) {
+      return (
+        <div className="w-full max-w-sm mx-auto mb-8">
+          <div className="text-center mb-6">
+            <div className="flex flex-col items-center space-y-3">
+              <img 
+                src={logo} 
+                alt="MathX Logo" 
+                className="w-16 h-16 object-cover scale-150"
+              />
+              <h1 className="text-3xl font-bold text-white tracking-wider">
+                MathX
+              </h1>
             </div>
-            <div className="text-xs text-gray-300">DAYS</div>
           </div>
-          <div className="bg-black/30 rounded-lg p-2">
-            <div className="text-2xl font-bold text-cyan-400 drop-shadow-lg">
-              {timeLeft.hours.toString().padStart(2, '0')}
+          <div className="rounded-2xl p-6 text-center relative overflow-hidden bg-gray-800/50">
+            <div className="animate-pulse">
+              <div className="h-6 bg-gray-600 rounded mb-2"></div>
+              <div className="h-4 bg-gray-600 rounded mb-4"></div>
+              <div className="grid grid-cols-4 gap-2">
+                {[1,2,3,4].map(i => (
+                  <div key={i} className="bg-gray-700 rounded-lg p-2">
+                    <div className="h-8 bg-gray-600 rounded mb-1"></div>
+                    <div className="h-3 bg-gray-600 rounded"></div>
+                  </div>
+                ))}
+              </div>
             </div>
-            <div className="text-xs text-gray-300">HOURS</div>
-          </div>
-          <div className="bg-black/30 rounded-lg p-2">
-            <div className="text-2xl font-bold text-cyan-400 drop-shadow-lg">
-              {timeLeft.minutes.toString().padStart(2, '0')}
-            </div>
-            <div className="text-xs text-gray-300">MIN</div>
-          </div>
-          <div className="bg-black/30 rounded-lg p-2">
-            <div className="text-2xl font-bold text-cyan-400 drop-shadow-lg">
-              {timeLeft.seconds.toString().padStart(2, '0')}
-            </div>
-            <div className="text-xs text-gray-300">SEC</div>
           </div>
         </div>
+      );
+    }
+
+    if (!currentEvent) {
+      return (
+        <div className="w-full max-w-sm mx-auto mb-8">
+          <div className="text-center mb-6">
+            <div className="flex flex-col items-center space-y-3">
+              <img 
+                src={logo} 
+                alt="MathX Logo" 
+                className="w-16 h-16 object-cover scale-150"
+              />
+              <h1 className="text-3xl font-bold text-white tracking-wider">
+                MathX
+              </h1>
+            </div>
+          </div>
+          <div className="rounded-2xl p-6 text-center relative overflow-hidden bg-gray-800/50">
+            <h2 className="text-lg font-semibold text-white mb-2">
+              No Active Events
+            </h2>
+            <p className="text-sm text-gray-200">
+              Check back later for upcoming events
+            </p>
+          </div>
+        </div>
+      );
+    }
+
+    return (
+      <div className="w-full max-w-sm mx-auto mb-8">
+        {/* MATHX Header with Logo */}
+        <div className="text-center mb-6">
+          <div className="flex flex-col items-center space-y-3">
+            <img 
+              src={logo} 
+              alt="MathX Logo" 
+              className="w-16 h-16 object-cover scale-150"
+            />
+            <h1 className="text-3xl font-bold text-white tracking-wider">
+              MathX
+            </h1>
+          </div>
+        </div>
+
+        {/* Countdown Banner */}
+        <div 
+          className="rounded-2xl p-6 text-center relative overflow-hidden"
+          style={{ backgroundColor: currentEvent.theme?.backgroundColor || 'rgba(161, 70, 212, 0.65)' }}
+        >
+          <h2 className="text-lg font-semibold text-white mb-2">
+            {currentEvent.title}
+          </h2>
+          <p className="text-sm text-gray-200 mb-4">
+            {currentEvent.description}
+          </p>
+          
+          {/* Event Status Badge */}
+          <div className="flex justify-center mb-4">
+            {isLive ? (
+              <span className="bg-gradient-to-r from-red-500 to-red-400 text-white px-3 py-1 rounded-full text-xs font-semibold animate-pulse">
+                🔴 LIVE NOW
+              </span>
+            ) : (
+              <span className="bg-gradient-to-r from-cyan-400 to-blue-400 text-white px-3 py-1 rounded-full text-xs font-semibold">
+                ⏰ {isLive ? 'LIVE' : 'UPCOMING'}
+              </span>
+            )}
+          </div>
+          
+          {/* Countdown Timer */}
+          <div className="grid grid-cols-4 gap-2">
+            <div className="bg-black/30 rounded-lg p-2">
+              <div className="text-2xl font-bold text-cyan-400 drop-shadow-lg">
+                {timeLeft.days.toString().padStart(2, '0')}
+              </div>
+              <div className="text-xs text-gray-300">DAYS</div>
+            </div>
+            <div className="bg-black/30 rounded-lg p-2">
+              <div className="text-2xl font-bold text-cyan-400 drop-shadow-lg">
+                {timeLeft.hours.toString().padStart(2, '0')}
+              </div>
+              <div className="text-xs text-gray-300">HOURS</div>
+            </div>
+            <div className="bg-black/30 rounded-lg p-2">
+              <div className="text-2xl font-bold text-cyan-400 drop-shadow-lg">
+                {timeLeft.minutes.toString().padStart(2, '0')}
+              </div>
+              <div className="text-xs text-gray-300">MIN</div>
+            </div>
+            <div className="bg-black/30 rounded-lg p-2">
+              <div className="text-2xl font-bold text-cyan-400 drop-shadow-lg">
+                {timeLeft.seconds.toString().padStart(2, '0')}
+              </div>
+              <div className="text-xs text-gray-300">SEC</div>
+            </div>
+          </div>
+          
+          {/* Event Details */}
+          <div className="mt-4 text-xs text-gray-300">
+            <p>Duration: {currentEvent.duration}</p>
+            <p>Location: {currentEvent.location}</p>
+          </div>
+        </div>
       </div>
-    </div>
-  );
+    );
+  };
 
   const LinksSection = () => {
     // SVG Icon Components
@@ -140,37 +211,69 @@ const LinksPage = () => {
       </svg>
     );
 
-    const links = [
-      {
-        icon: RegistrationIcon,
-        title: "Registration",
-        description: "Register for MathX Club membership",
-        url: "#",
-        color: "from-purple-500 to-indigo-500",
-        isRegistration: true
-      },
-      {
-        icon: MessageIcon,
-        title: "Join our WhatsApp Community",
-        description: "Connect with fellow math enthusiasts",
-        url: "https://chat.whatsapp.com/IR5h08SJL3qDFjwvazgFA5?mode=ems_qr_t",
-        color: "from-green-500 to-green-400"
-      },
-      {
-        icon: InstagramIcon,
-        title: "Follow us on Instagram",
-        description: "Daily math tips and updates",
-        url: "https://instagram.com/mathxpccoer",
-        color: "from-pink-500 to-purple-500"
-      },
-      {
-        icon: GlobeIcon,
-        title: "Visit MathX Website",
-        description: "Explore our full platform",
-        url: "https://mathxpccoer.pages.dev",
-        color: "from-blue-500 to-cyan-400"
+    // Get links from event data or use default links
+    const getEventLinks = () => {
+      if (currentEvent?.links && currentEvent.links.length > 0) {
+        return currentEvent.links.map(link => ({
+          icon: getIconComponent(link.type),
+          title: link.title,
+          description: link.description,
+          url: link.url,
+          color: link.color,
+          isRegistration: link.isRegistration || false
+        }));
       }
-    ];
+      
+      // Default links if no event data
+      return [
+        {
+          icon: RegistrationIcon,
+          title: "Registration",
+          description: "Register for MathX Club membership",
+          url: "#",
+          color: "from-purple-500 to-indigo-500",
+          isRegistration: true
+        },
+        {
+          icon: MessageIcon,
+          title: "Join our WhatsApp Community",
+          description: "Connect with fellow math enthusiasts",
+          url: "https://chat.whatsapp.com/IR5h08SJL3qDFjwvazgFA5?mode=ems_qr_t",
+          color: "from-green-500 to-green-400"
+        },
+        {
+          icon: InstagramIcon,
+          title: "Follow us on Instagram",
+          description: "Daily math tips and updates",
+          url: "https://instagram.com/mathxpccoer",
+          color: "from-pink-500 to-purple-500"
+        },
+        {
+          icon: GlobeIcon,
+          title: "Visit MathX Website",
+          description: "Explore our full platform",
+          url: "https://mathxpccoer.pages.dev",
+          color: "from-blue-500 to-cyan-400"
+        }
+      ];
+    };
+
+    const getIconComponent = (type) => {
+      switch (type) {
+        case 'registration':
+          return RegistrationIcon;
+        case 'whatsapp':
+          return MessageIcon;
+        case 'instagram':
+          return InstagramIcon;
+        case 'website':
+          return GlobeIcon;
+        default:
+          return GlobeIcon;
+      }
+    };
+
+    const links = getEventLinks();
 
     const handleLinkClick = (link) => {
       if (link.isRegistration) {

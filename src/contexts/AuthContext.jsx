@@ -46,7 +46,7 @@ export const AuthProvider = ({ children }) => {
   const login = async (email, password) => {
     try {
       setLoading(true);
-      await account.createEmailSession(email, password);
+      await account.createEmailPasswordSession(email, password);
       const currentUser = await account.get();
       setUser(currentUser);
       setIsAuthenticated(true);
@@ -58,16 +58,27 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
-  const register = async (name, email, password) => {
+  const register = async (name, email, password, phone, rollno) => {
     try {
       setLoading(true);
-      await account.create(ID.unique(), email, password, name);
+      // const phone = `+91${inphone}`;
+      console.log(phone);
+      await account.create(ID.unique(), email, password, name, phone);
       // Auto-login after registration
-      await account.createEmailSession(email, password);
+      await account.createEmailPasswordSession(email, password);
       const currentUser = await account.get();
       setUser(currentUser);
       setIsAuthenticated(true);
-      return { success: true, user: currentUser };
+      const promise = account.updatePrefs({
+        phone: phone,
+        rollno: rollno
+      });
+      if (promise) {
+        return { success: true, user: currentUser };
+      } else {
+        return { success: false, message: 'Registration failed. Please try again.' };
+      }
+      
     } catch (error) {
       throw new Error(error.message || 'Registration failed. Please try again.');
     } finally {

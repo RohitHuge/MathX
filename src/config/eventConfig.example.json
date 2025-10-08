@@ -1,0 +1,60 @@
+{
+  "currentEvent": {
+    "id": "math-workshop-2025",
+    "title": "Advanced Calculus Workshop",
+    "description": "Master advanced calculus concepts with our expert instructors",
+    "startTime": "2025-12-15T14:00:00.000Z",
+    "endTime": "2025-12-15T17:00:00.000Z",
+    "duration": "3 hours",
+    "location": "Online Workshop",
+    "registrationUrl": "/registration",
+    "isActive": true,
+    "theme": {
+      "primaryColor": "#49E3FF",
+      "secondaryColor": "#A146D4",
+      "backgroundColor": "rgba(73, 227, 255, 0.65)"
+    },
+    "links": [
+      {
+        "type": "registration",
+        "title": "Register for Workshop",
+        "description": "Secure your spot for the calculus workshop",
+        "url": "/registration",
+        "color": "from-blue-500 to-cyan-400",
+        "isRegistration": true
+      },
+      {
+        "type": "whatsapp",
+        "title": "Join Study Group",
+        "description": "Connect with other participants",
+        "url": "https://chat.whatsapp.com/example",
+        "color": "from-green-500 to-green-400"
+      },
+      {
+        "type": "website",
+        "title": "View Materials",
+        "description": "Access workshop materials and resources",
+        "url": "https://mathxpccoer.pages.dev/materials",
+        "color": "from-purple-500 to-indigo-500"
+      }
+    ]
+  },
+  "upcomingEvents": [
+    {
+      "id": "math-contest-2025",
+      "title": "Annual Math Contest",
+      "description": "Compete with students from around the world",
+      "startTime": "2025-12-20T10:00:00.000Z",
+      "endTime": "2025-12-20T12:00:00.000Z",
+      "duration": "2 hours",
+      "location": "Online Contest",
+      "registrationUrl": "/registration",
+      "isActive": false,
+      "theme": {
+        "primaryColor": "#FF6B6B",
+        "secondaryColor": "#4ECDC4",
+        "backgroundColor": "rgba(255, 107, 107, 0.65)"
+      }
+    }
+  ]
+}

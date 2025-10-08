@@ -6,6 +6,8 @@ import ReactMarkdown from 'react-markdown';
 import remarkMath from 'remark-math';
 import rehypeKatex from 'rehype-katex';
 import 'katex/dist/katex.min.css';
+import { useAuth } from '../../contexts/AuthContext';
+import { useContestScore } from '../../hooks/useContestScore';
 import { 
   Clock, 
   AlertTriangle, 
@@ -30,9 +32,51 @@ const client = new Client()
 
 const databases = new Databases(client);
 
+// Local error boundary to prevent markdown/math crashes from breaking the page
+class MarkdownErrorBoundary extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = { hasError: false };
+  }
+  static getDerivedStateFromError() {
+    return { hasError: true };
+  }
+  componentDidCatch() {}
+  render() {
+    if (this.state.hasError) {
+      const fallbackText = typeof this.props.fallback === 'string' ? this.props.fallback : '';
+      return <span>{fallbackText}</span>;
+    }
+    return this.props.children;
+  }
+}
+
+const Markdown = ({ text }) => {
+  const normalizeMathDelimiters = (input) => {
+    if (typeof input !== 'string') return '';
+    // Convert \( ... \) to $ ... $ and \[ ... \] to $$ ... $$ for remark-math
+    return input
+      .replace(/\\\(/g, '$')
+      .replace(/\\\)/g, '$')
+      .replace(/\\\[/g, '$$')
+      .replace(/\\\]/g, '$$');
+  };
+  const safeText = normalizeMathDelimiters(text);
+  return (
+    <ReactMarkdown
+      remarkPlugins={[remarkMath({ singleDollar: true })]}
+      rehypePlugins={[[rehypeKatex, { throwOnError: false, strict: false }]]}
+    >
+      {safeText}
+    </ReactMarkdown>
+  );
+};
+
 const ContestPage = () => {
   const { contestId } = useParams();
   const navigate = useNavigate();
+  const { user } = useAuth();
+  const { loading: scoreLoading, error: scoreError, getUserContestScore, startContest, submitContest } = useContestScore();
   
   // State management
   const [contest, setContest] = useState(null);
@@ -46,6 +90,7 @@ const ContestPage = () => {
   const [startTime, setStartTime] = useState(null);
   const [score, setScore] = useState(null);
   const [submitted, setSubmitted] = useState(false);
+  const [existingScore, setExistingScore] = useState(null);
   
   // Anti-cheating state
   const [isFullscreen, setIsFullscreen] = useState(false);
@@ -180,11 +225,42 @@ const ContestPage = () => {
           return;
         }
         
-        // Contest is active - show instructions first
-        setContestStarted(true);
-        setStartTime(now);
-        setTimeRemaining(contestDuration);
-        setShowContestInstructions(true);
+        // Check for existing score record if user is logged in
+        if (user) {
+          const existingScoreRecord = await getUserContestScore(contestId, user.$id);
+          if (existingScoreRecord) {
+            setExistingScore(existingScoreRecord);
+            
+            // If the contest was already submitted, show the score
+            if (existingScoreRecord.end_time) {
+              setContestEnded(true);
+              setSubmitted(true);
+              setScore({
+                totalScore: existingScoreRecord.score,
+                percentage: existingScoreRecord.score
+              });
+            } else {
+              // Calculate remaining time based on start_time
+              const elapsedTime = now - new Date(existingScoreRecord.start_time);
+              const remainingTime = Math.max(0, contestDuration - elapsedTime);
+              
+              if (remainingTime > 0) {
+                setTimeRemaining(remainingTime);
+                setStartTime(new Date(existingScoreRecord.start_time));
+                setContestStarted(true);
+                showToast('Resuming your previous attempt', 'info');
+              } else {
+                // Time has expired, auto-submit
+                handleAutoSubmit();
+              }
+            }
+          }
+        }
+        
+        // Show instructions if no existing score
+        if (!existingScore) {
+          setShowContestInstructions(true);
+        }
         
         setLoading(false);
         
@@ -278,11 +354,13 @@ const ContestPage = () => {
     
     // Submit results to backend
     try {
-      const result = await submitContestResults(contestId, answers, scoreData, 'current_user_id');
-      if (result.success) {
-        showToast('Results submitted successfully!', 'success');
-      } else {
-        showToast('Failed to submit results. Please try again.', 'error');
+      if (user) {
+        const result = await submitContest(contestId, user.$id, scoreData);
+        if (result) {
+          showToast('Results submitted successfully!', 'success');
+        } else {
+          showToast('Failed to submit results. Please try again.', 'error');
+        }
       }
     } catch (error) {
       console.error('Submission error:', error);
@@ -304,11 +382,13 @@ const ContestPage = () => {
     
     // Submit results to backend
     try {
-      const result = await submitContestResults(contestId, answers, scoreData, 'current_user_id');
-      if (result.success) {
-        showToast('Results submitted successfully!', 'success');
-      } else {
-        showToast('Failed to submit results. Please try again.', 'error');
+      if (user) {
+        const result = await submitContest(contestId, user.$id, scoreData.totalScore);
+        if (result) {
+          showToast('Results submitted successfully!', 'success');
+        } else {
+          showToast('Failed to submit results. Please try again.', 'error');
+        }
       }
     } catch (error) {
       console.error('Submission error:', error);
@@ -323,8 +403,32 @@ const ContestPage = () => {
 
   // Handle accepting contest instructions and requesting fullscreen
   const handleAcceptInstructions = async () => {
-    setShowContestInstructions(false);
-    await requestFullscreen();
+    try {
+      if (!user) {
+        showToast('Please login to start the contest', 'error');
+        return;
+      }
+      
+      await requestFullscreen();
+      const now = new Date();
+      
+      // Create score record
+      const scoreRecord = await startContest(contestId, user.$id);
+      if (!scoreRecord) {
+        throw new Error('Failed to create score record');
+      }
+      
+      setContestStarted(true);
+      setStartTime(now);
+      // Initialize timer for new attempts
+      if (contest && typeof contest.contestDuration === 'number') {
+        setTimeRemaining(Math.max(0, contest.contestDuration * 60 * 1000));
+      }
+      setShowContestInstructions(false);
+    } catch (error) {
+      console.error('Error starting contest:', error);
+      showToast('Failed to start contest. Please try again.', 'error');
+    }
   };
 
   // Handle fullscreen violation - restart fullscreen
@@ -699,12 +803,9 @@ const ContestPage = () => {
                 <div className="flex-1">
                   <div className="mb-3 lg:mb-6">
                     <div className="prose prose-invert max-w-none text-white prose-sm lg:prose-base">
-                      <ReactMarkdown 
-                        remarkPlugins={[remarkMath]} 
-                        rehypePlugins={[rehypeKatex]}
-                      >
-                        {questions[currentQuestionIndex].question}
-                      </ReactMarkdown>
+                      <MarkdownErrorBoundary fallback={String(questions[currentQuestionIndex].question || '')}>
+                        <Markdown text={questions[currentQuestionIndex].question} />
+                      </MarkdownErrorBoundary>
                     </div>
                   </div>
                   
@@ -732,12 +833,9 @@ const ContestPage = () => {
                           />
                           <span className="font-bold text-white text-sm lg:text-lg w-6 lg:w-8">{option}.</span>
                           <div className="prose prose-invert max-w-none flex-1 text-white prose-sm lg:prose-base">
-                            <ReactMarkdown 
-                              remarkPlugins={[remarkMath]} 
-                              rehypePlugins={[rehypeKatex]}
-                            >
-                              {optionText}
-                            </ReactMarkdown>
+                            <MarkdownErrorBoundary fallback={String(optionText || '')}>
+                              <Markdown text={optionText} />
+                            </MarkdownErrorBoundary>
                           </div>
                         </label>
                       );

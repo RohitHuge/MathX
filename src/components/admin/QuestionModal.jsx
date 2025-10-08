@@ -351,10 +351,16 @@ const QuestionModal = ({ isOpen, onClose, onSave, question }) => {
                   <div className="bg-white/5 border border-white/10 rounded-lg p-4">
                     <div className="prose prose-invert max-w-none">
                       <ReactMarkdown
-                        remarkPlugins={[remarkMath]}
-                        rehypePlugins={[rehypeKatex]}
+                        remarkPlugins={[remarkMath({ singleDollar: true })]}
+                        rehypePlugins={[[rehypeKatex, { throwOnError: false, strict: false }]]}
                       >
-                        {formData.question || '*Enter your question above to see the preview*'}
+                        {(typeof formData.question === 'string'
+                          ? formData.question
+                              .replace(/\\\(/g, '$')
+                              .replace(/\\\)/g, '$')
+                              .replace(/\\\[/g, '$$')
+                              .replace(/\\\]/g, '$$')
+                          : '') || '*Enter your question above to see the preview*'}
                       </ReactMarkdown>
                     </div>
                     
@@ -377,10 +383,16 @@ const QuestionModal = ({ isOpen, onClose, onSave, question }) => {
                               </span>
                               <div className="prose prose-invert max-w-none text-sm">
                                 <ReactMarkdown
-                                  remarkPlugins={[remarkMath]}
-                                  rehypePlugins={[rehypeKatex]}
+                                  remarkPlugins={[remarkMath({ singleDollar: true })]}
+                                  rehypePlugins={[[rehypeKatex, { throwOnError: false, strict: false }]]}
                                 >
-                                  {option.text || '*Empty option*'}
+                                  {(typeof option.text === 'string'
+                                    ? option.text
+                                        .replace(/\\\(/g, '$')
+                                        .replace(/\\\)/g, '$')
+                                        .replace(/\\\[/g, '$$')
+                                        .replace(/\\\]/g, '$$')
+                                    : '') || '*Empty option*'}
                                 </ReactMarkdown>
                               </div>
                               {formData.correctAnswer === option.id && (

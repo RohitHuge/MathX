@@ -3,6 +3,10 @@ import { motion, AnimatePresence } from 'motion/react';
 import { Client, Databases, Query } from 'appwrite';
 import { X, Plus, Edit, Trash2, Eye, CheckCircle } from 'lucide-react';
 import QuestionModal from './QuestionModal';
+import ReactMarkdown from 'react-markdown';
+import remarkMath from 'remark-math';
+import rehypeKatex from 'rehype-katex';
+import 'katex/dist/katex.min.css';
 import DeleteConfirmModal from './DeleteConfirmModal';
 import { appwriteEndpoint, appwriteProjectId, appwriteDatabaseId } from '../../../config.js';
 
@@ -320,9 +324,20 @@ const QuestionsModal = ({ isOpen, onClose, contest }) => {
                           >
                             <td className="px-6 py-4">
                               <div className="max-w-md">
-                                <p className="text-white text-sm line-clamp-2">
-                                  {question.question}
-                                </p>
+                                <div className="prose prose-invert max-w-none text-white prose-sm">
+                                  <ReactMarkdown
+                                    remarkPlugins={[remarkMath({ singleDollar: true })]}
+                                    rehypePlugins={[[rehypeKatex, { throwOnError: false, strict: false }]]}
+                                  >
+                                    {typeof question.question === 'string'
+                                      ? question.question
+                                          .replace(/\\\(/g, '$')
+                                          .replace(/\\\)/g, '$')
+                                          .replace(/\\\[/g, '$$')
+                                          .replace(/\\\]/g, '$$')
+                                      : ''}
+                                  </ReactMarkdown>
+                                </div>
                                 <p className="text-[#AEAEAE] text-xs mt-1">
                                   Created: {formatDate(question.createdAt)}
                                 </p>

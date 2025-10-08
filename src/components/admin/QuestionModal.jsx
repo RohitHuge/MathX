@@ -6,6 +6,45 @@ import remarkMath from 'remark-math';
 import rehypeKatex from 'rehype-katex';
 import 'katex/dist/katex.min.css';
 
+// Local error boundary + safe Markdown to prevent remark-math crashes
+class MarkdownErrorBoundary extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = { hasError: false };
+  }
+  static getDerivedStateFromError() {
+    return { hasError: true };
+  }
+  componentDidCatch() {}
+  render() {
+    if (this.state.hasError) {
+      const fallbackText = typeof this.props.fallback === 'string' ? this.props.fallback : '';
+      return <span>{fallbackText}</span>;
+    }
+    return this.props.children;
+  }
+}
+
+const Markdown = ({ text }) => {
+  const normalizeMathDelimiters = (input) => {
+    if (typeof input !== 'string') return '';
+    return input
+      .replace(/\\\(/g, '$')
+      .replace(/\\\)/g, '$')
+      .replace(/\\\[/g, '$$')
+      .replace(/\\\]/g, '$$');
+  };
+  const safeText = normalizeMathDelimiters(text);
+  return (
+    <ReactMarkdown
+      remarkPlugins={[[remarkMath, { singleDollar: true }]]}
+      rehypePlugins={[[rehypeKatex, { throwOnError: false, strict: false }]]}
+    >
+      {safeText}
+    </ReactMarkdown>
+  );
+};
+
 const QuestionModal = ({ isOpen, onClose, onSave, question }) => {
   const [formData, setFormData] = useState({
     question: '',
@@ -350,18 +389,9 @@ const QuestionModal = ({ isOpen, onClose, onSave, question }) => {
                   <h3 className="text-lg font-semibold text-white mb-4">Preview</h3>
                   <div className="bg-white/5 border border-white/10 rounded-lg p-4">
                     <div className="prose prose-invert max-w-none">
-                      <ReactMarkdown
-                        remarkPlugins={[remarkMath({ singleDollar: true })]}
-                        rehypePlugins={[[rehypeKatex, { throwOnError: false, strict: false }]]}
-                      >
-                        {(typeof formData.question === 'string'
-                          ? formData.question
-                              .replace(/\\\(/g, '$')
-                              .replace(/\\\)/g, '$')
-                              .replace(/\\\[/g, '$$')
-                              .replace(/\\\]/g, '$$')
-                          : '') || '*Enter your question above to see the preview*'}
-                      </ReactMarkdown>
+                      <MarkdownErrorBoundary fallback={(typeof formData.question === 'string' ? formData.question : '')}>
+                        <Markdown text={formData.question || '*Enter your question above to see the preview*'} />
+                      </MarkdownErrorBoundary>
                     </div>
                     
                     {formData.question && (
@@ -382,18 +412,9 @@ const QuestionModal = ({ isOpen, onClose, onSave, question }) => {
                                 {option.id.toUpperCase()}.
                               </span>
                               <div className="prose prose-invert max-w-none text-sm">
-                                <ReactMarkdown
-                                  remarkPlugins={[remarkMath({ singleDollar: true })]}
-                                  rehypePlugins={[[rehypeKatex, { throwOnError: false, strict: false }]]}
-                                >
-                                  {(typeof option.text === 'string'
-                                    ? option.text
-                                        .replace(/\\\(/g, '$')
-                                        .replace(/\\\)/g, '$')
-                                        .replace(/\\\[/g, '$$')
-                                        .replace(/\\\]/g, '$$')
-                                    : '') || '*Empty option*'}
-                                </ReactMarkdown>
+                                <MarkdownErrorBoundary fallback={(typeof option.text === 'string' ? option.text : '')}>
+                                  <Markdown text={option.text || '*Empty option*'} />
+                                </MarkdownErrorBoundary>
                               </div>
                               {formData.correctAnswer === option.id && (
                                 <span className="text-green-400 text-xs font-medium">

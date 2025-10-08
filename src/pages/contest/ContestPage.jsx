@@ -55,16 +55,21 @@ const Markdown = ({ text }) => {
   const normalizeMathDelimiters = (input) => {
     if (typeof input !== 'string') return '';
     // Convert \( ... \) to $ ... $ and \[ ... \] to $$ ... $$ for remark-math
-    return input
+    let s = input
       .replace(/\\\(/g, '$')
       .replace(/\\\)/g, '$')
       .replace(/\\\[/g, '$$')
       .replace(/\\\]/g, '$$');
+    // If no $ present but LaTeX commands exist, auto-wrap inline
+    if (!/[\$]/.test(s) && /\\[a-zA-Z]+/.test(s)) {
+      s = `$${s}$`;
+    }
+    return s;
   };
   const safeText = normalizeMathDelimiters(text);
   return (
     <ReactMarkdown
-      remarkPlugins={[remarkMath({ singleDollar: true })]}
+      remarkPlugins={[[remarkMath, { singleDollar: true }]]}
       rehypePlugins={[[rehypeKatex, { throwOnError: false, strict: false }]]}
     >
       {safeText}

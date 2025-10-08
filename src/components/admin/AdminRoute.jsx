@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useAuth } from '../../contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'motion/react';
@@ -12,13 +12,18 @@ const AdminRoute = ({ children }) => {
   // Check if user has admin privileges
   const isAdmin = isUserAdmin(user);
 
-  // If not authenticated, redirect to login
+  // Redirects must be in effects
+  useEffect(() => {
+    if (!isAuthenticated) {
+      navigate('/auth');
+    }
+  }, [isAuthenticated, navigate]);
+
+  // If authenticated but not admin, show access denied
   if (!isAuthenticated) {
-    navigate('/auth');
     return null;
   }
 
-  // If authenticated but not admin, show access denied
   if (!isAdmin) {
     return (
       <div className="min-h-screen bg-[#191D2A] flex items-center justify-center p-4">

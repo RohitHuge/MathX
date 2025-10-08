@@ -518,7 +518,7 @@ const ContestManagement = () => {
                   
                   return (
                     <motion.tr
-                      key={contest.id}
+                      key={contest.$id || contest.id}
                       className="border-b border-white/10 hover:bg-white/5 transition-colors duration-200"
                       initial={{ opacity: 0, y: 20 }}
                       animate={{ opacity: 1, y: 0 }}

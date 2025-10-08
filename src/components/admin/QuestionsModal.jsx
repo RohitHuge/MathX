@@ -17,6 +17,48 @@ const client = new Client()
 
 const databases = new Databases(client);
 
+// Safe Markdown helpers
+class MarkdownErrorBoundary extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = { hasError: false };
+  }
+  static getDerivedStateFromError() { return { hasError: true }; }
+  componentDidCatch() {}
+  render() {
+    if (this.state.hasError) {
+      const fallbackText = typeof this.props.fallback === 'string' ? this.props.fallback : '';
+      return <span>{fallbackText}</span>;
+    }
+    return this.props.children;
+  }
+}
+
+const normalizeMathDelimiters = (input) => {
+  if (typeof input !== 'string') return '';
+  let s = input
+    .replace(/\\\(/g, '$')
+    .replace(/\\\)/g, '$')
+    .replace(/\\\[/g, '$$')
+    .replace(/\\\]/g, '$$');
+  if (!/[\$]/.test(s) && /\\[a-zA-Z]+/.test(s)) {
+    s = `$${s}$`;
+  }
+  return s;
+};
+
+const Markdown = ({ text }) => {
+  const safeText = normalizeMathDelimiters(text);
+  return (
+    <ReactMarkdown
+      remarkPlugins={[[remarkMath, { singleDollar: true }]]}
+      rehypePlugins={[[rehypeKatex, { throwOnError: false, strict: false }]]}
+    >
+      {safeText}
+    </ReactMarkdown>
+  );
+};
+
 // Helper function to convert Appwrite question to display format
 const convertQuestionFromAppwrite = (question) => {
   return {
@@ -325,18 +367,9 @@ const QuestionsModal = ({ isOpen, onClose, contest }) => {
                             <td className="px-6 py-4">
                               <div className="max-w-md">
                                 <div className="prose prose-invert max-w-none text-white prose-sm">
-                                  <ReactMarkdown
-                                    remarkPlugins={[remarkMath({ singleDollar: true })]}
-                                    rehypePlugins={[[rehypeKatex, { throwOnError: false, strict: false }]]}
-                                  >
-                                    {typeof question.question === 'string'
-                                      ? question.question
-                                          .replace(/\\\(/g, '$')
-                                          .replace(/\\\)/g, '$')
-                                          .replace(/\\\[/g, '$$')
-                                          .replace(/\\\]/g, '$$')
-                                      : ''}
-                                  </ReactMarkdown>
+                                  <MarkdownErrorBoundary fallback={typeof question.question === 'string' ? question.question : ''}>
+                                    <Markdown text={question.question} />
+                                  </MarkdownErrorBoundary>
                                 </div>
                                 <p className="text-[#AEAEAE] text-xs mt-1">
                                   Created: {formatDate(question.createdAt)}

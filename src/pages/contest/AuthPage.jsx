@@ -236,7 +236,7 @@ const AuthPage = () => {
                     className={`w-full px-4 py-3 bg-white/10 border rounded-lg text-white placeholder-[#AEAEAE] focus:outline-none focus:ring-2 focus:ring-[#A146D4] transition-all duration-200 ${
                       errors.rollno ? 'border-red-500' : 'border-white/20'
                     }`}
-                    placeholder="SECOE60"
+                    placeholder="FECOMPE60"
                   />
                   {errors.rollno && (
                     <p className="mt-1 text-sm text-red-400">{errors.rollno}</p>

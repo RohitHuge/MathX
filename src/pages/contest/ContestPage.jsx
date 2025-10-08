@@ -96,6 +96,7 @@ const ContestPage = () => {
   const [score, setScore] = useState(null);
   const [submitted, setSubmitted] = useState(false);
   const [existingScore, setExistingScore] = useState(null);
+  const [endAt, setEndAt] = useState(null);
   
   // Anti-cheating state
   const [isFullscreen, setIsFullscreen] = useState(false);
@@ -294,6 +295,7 @@ const ContestPage = () => {
               if (remainingTime > 0) {
                 setTimeRemaining(remainingTime);
                 setStartTime(new Date(existingScoreRecord.start_time));
+                setEndAt(new Date(new Date(existingScoreRecord.start_time).getTime() + contestDuration));
                 setContestStarted(true);
                 showToast('Resuming your previous attempt', 'info');
               } else {
@@ -497,6 +499,7 @@ const ContestPage = () => {
         const startedAt = scoreRecord.start_time ? new Date(scoreRecord.start_time) : now;
         const elapsed = now - startedAt;
         setTimeRemaining(Math.max(0, durationMs - elapsed));
+        setEndAt(new Date(startedAt.getTime() + durationMs));
       }
       setStartTime(now);
       setContestStarted(true);
@@ -797,6 +800,11 @@ const ContestPage = () => {
               <p className="text-lg lg:text-2xl font-bold text-[#49E3FF]">
                 {formatTime(timeRemaining)}
               </p>
+              {endAt && (
+                <p className="text-[10px] lg:text-xs text-[#AEAEAE] mt-1">
+                  Ends at: {endAt.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                </p>
+              )}
             </div>
             
             {!isFullscreen && (

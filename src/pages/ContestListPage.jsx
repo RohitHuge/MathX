@@ -421,6 +421,11 @@ const ContestListPage = () => {
                             <Eye className="w-4 h-4" />
                             <span>View Results</span>
                           </>
+                        ) : !isAuthenticated ? (
+                          <>
+                            <Play className="w-4 h-4" />
+                            <span>Login to participate</span>
+                          </>
                         ) : (
                           <>
                             <Play className="w-4 h-4" />

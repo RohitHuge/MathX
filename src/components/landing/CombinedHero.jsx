@@ -60,7 +60,7 @@ const CombinedHero = ({
             title: featuredContest.title,
             description: featuredContest.description,
             start_time: featuredContest.startTime,
-            duration: `${featuredContest.eventDuration} min`,
+            duration: `${featuredContest.contestDuration} min`,
             question_count: featuredContest.questionCount,
             status: featuredContest.status,
             difficulty: featuredContest.difficulty,

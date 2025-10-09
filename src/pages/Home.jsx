@@ -426,8 +426,8 @@ useEffect(() => {
 
         {/* CTA Buttons (unchanged) */}
         <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-12">
-          <button onClick={() => window.location.href = '/contact'} className="bg-[#49E3FF]/80 text-[#191D2A] px-8 py-3 rounded-lg font-semibold hover:shadow-lg hover:shadow-[#49E3FF]/25 transition-all duration-300 hover:scale-105 transform">
-            Join Us
+          <button onClick={() => window.location.href = '/contest'} className="bg-[#49E3FF]/80 text-[#191D2A] px-8 py-3 rounded-lg font-semibold hover:shadow-lg hover:shadow-[#49E3FF]/25 transition-all duration-300 hover:scale-105 transform">
+            Attempt Contest
           </button>
           <button onClick={() => window.location.href = '/about'} className="border-2 border-white/80 text-white px-8 py-3 rounded-lg font-semibold hover:bg-white/90 hover:text-[#191D2A] transition-all duration-300 hover:scale-105 transform">
             Learn More
@@ -519,20 +519,20 @@ function UpcomingEvents() {
   const events = [
     {
       id: 1,
-      title: "MathX Inauguration",
-      date: "1st October 2025",
-      time: "12:00 PM",
-      description: "Join us for the grand opening of MathX Club with special guest speakers, interactive sessions, and networking opportunities.",
-      highlight: "🎉 Grand Opening Event",
-      status: "upcoming"
-    },
-    {
-      id: 2,
       title: "Weekly Online Quiz",
-      date: "2st October 2025 onwards(Every Thursday)",
+      date: "9th October 2025 onwards(Every Tuesday)",
       time: "TBA",
       description: "Test your mathematical skills in our weekly online quiz competition. Challenge yourself and compete with peers.",
       highlight: "Get Certificate Instantly",
+      status: "ongoing"
+    },
+    {
+      id: 2,
+      title: "Maths Premier League",
+      date: "upcoming",
+      time: "TBA",
+      description: "A fun auction of brilliant minds in mathematics. Competiting with each other to win the title of Maths Premier League.",
+      highlight: "🏆 Maths Premier League",
       status: "upcoming"
     },
     {

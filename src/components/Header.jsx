@@ -71,8 +71,8 @@ const Header = () => {
             }`}>
               Contact
             </Link>
-            <button onClick={() => window.location.href = '/contact'} className="bg-gradient-to-br from-[#A146D4]/80 to-[#49E3FF]/80 text-white px-6 py-2 rounded-lg font-medium hover:shadow-lg hover:shadow-[#49E3FF]/25 transition-all duration-300 hover:scale-105">
-              Join Us
+            <button onClick={() => window.location.href = '/contest'} className="bg-gradient-to-br from-[#A146D4]/80 to-[#49E3FF]/80 text-white px-6 py-2 rounded-lg font-medium hover:shadow-lg hover:shadow-[#49E3FF]/25 transition-all duration-300 hover:scale-105 w-fit">
+              Attempt Contest
             </button>
           </nav>
 
@@ -116,8 +116,8 @@ const Header = () => {
               }`}>
                 Contact
               </Link>
-              <button onClick={() => window.location.href = '/contact'} className="bg-gradient-to-br from-[#A146D4]/80 to-[#49E3FF]/80 text-white px-6 py-2 rounded-lg font-medium hover:shadow-lg hover:shadow-[#49E3FF]/25 transition-all duration-300 hover:scale-105 w-fit">
-                Join Us
+              <button onClick={() => window.location.href = '/contest'} className="bg-gradient-to-br from-[#A146D4]/80 to-[#49E3FF]/80 text-white px-6 py-2 rounded-lg font-medium hover:shadow-lg hover:shadow-[#49E3FF]/25 transition-all duration-300 hover:scale-105 w-fit">
+                Attempt Contest
               </button>
             </nav>
           </div>

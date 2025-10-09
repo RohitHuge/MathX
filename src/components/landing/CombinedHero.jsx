@@ -3,6 +3,7 @@ import { motion } from 'motion/react';
 import { useNavigate } from 'react-router-dom';
 import { Client, Databases, Query } from 'appwrite';
 import { appwriteEndpoint, appwriteProjectId, appwriteDatabaseId } from '../../../config.js';
+import { useEventData } from '../../hooks/useEventData';
 
 // Appwrite configuration
 const client = new Client()
@@ -23,18 +24,13 @@ const CombinedHero = ({
   const [contest, setContest] = useState(null);
   const [loading, setLoading] = useState(true);
   const [timeLeft, setTimeLeft] = useState({
-    days: 0,
-    hours: 0,
-    minutes: 0,
-    seconds: 0
+    days: 0, hours: 0, minutes: 0, seconds: 0
   });
   const [isLive, setIsLive] = useState(false);
   const [timeUntilEnd, setTimeUntilEnd] = useState({
-    days: 0,
-    hours: 0,
-    minutes: 0,
-    seconds: 0
+    days: 0, hours: 0, minutes: 0, seconds: 0
   });
+  const { currentEvent } = useEventData();
 
   // Fetch featured contest from Appwrite
   useEffect(() => {
@@ -60,7 +56,9 @@ const CombinedHero = ({
             title: featuredContest.title,
             description: featuredContest.description,
             start_time: featuredContest.startTime,
-            duration: `${featuredContest.contestDuration} min`,
+            duration: `${featuredContest.contestDuration} min`, // card label only
+            event_duration: featuredContest.eventDuration, // add raw event duration in minutes
+            contest_duration: featuredContest.contestDuration, // add contest duration for fallback
             question_count: featuredContest.questionCount,
             status: featuredContest.status,
             difficulty: featuredContest.difficulty,
@@ -88,31 +86,31 @@ const CombinedHero = ({
   // Countdown timer logic
   useEffect(() => {
     if (!contest?.start_time) return;
-
     const updateCountdown = () => {
       const now = new Date().getTime();
       const startTime = new Date(contest.start_time).getTime();
       const difference = startTime - now;
-
-      // Check if contest is live (started but not ended)
       if (difference <= 0) {
-        // Contest has started, check if it's still within duration
-        const durationMinutes = parseInt(contest.duration.replace(/\D/g, '')) || 60; // Extract number from duration string
-        const endTime = startTime + (durationMinutes * 60 * 1000);
+        // Timer should count down eventDuration from contest, not contestDuration, when live
+        const eventMinutes = parseInt(contest.event_duration);
+        let endTime;
+        if (eventMinutes && eventMinutes > 0) {
+          endTime = startTime + (eventMinutes * 60 * 1000);
+        } else {
+          // Fallback to contest duration field
+          const durationMinutes = parseInt(contest.contest_duration) || 60;
+          endTime = startTime + (durationMinutes * 60 * 1000);
+        }
         const timeUntilEnd = endTime - now;
-
         if (timeUntilEnd > 0) {
-          // Contest is live - calculate time until end
           const days = Math.floor(timeUntilEnd / (1000 * 60 * 60 * 24));
           const hours = Math.floor((timeUntilEnd % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
           const minutes = Math.floor((timeUntilEnd % (1000 * 60 * 60)) / (1000 * 60));
           const seconds = Math.floor((timeUntilEnd % (1000 * 60)) / 1000);
-
           setTimeUntilEnd({ days, hours, minutes, seconds });
           setIsLive(true);
           setTimeLeft({ days: 0, hours: 0, minutes: 0, seconds: 0 });
         } else {
-          // Contest has ended, show as upcoming (this shouldn't happen with proper data)
           setIsLive(false);
           setTimeLeft({ days: 0, hours: 0, minutes: 0, seconds: 0 });
           setTimeUntilEnd({ days: 0, hours: 0, minutes: 0, seconds: 0 });
@@ -123,16 +121,14 @@ const CombinedHero = ({
         const hours = Math.floor((difference % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
         const minutes = Math.floor((difference % (1000 * 60 * 60)) / (1000 * 60));
         const seconds = Math.floor((difference % (1000 * 60)) / 1000);
-
         setTimeLeft({ days, hours, minutes, seconds });
         setIsLive(false);
       }
     };
-
     updateCountdown();
     const timer = setInterval(updateCountdown, 1000);
     return () => clearInterval(timer);
-  }, [contest?.start_time, contest?.duration]);
+  }, [contest?.start_time, contest?.event_duration, contest?.contest_duration]);
 
   const getButtonText = () => {
     if (isLive) return "Start Contest";

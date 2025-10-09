@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { supabase } from '../config/supabaseClient';
 
 // Mock data for leaderboard
 const mockLeaderboard = [
@@ -114,8 +115,6 @@ const mockLeaderboard = [
   }
 ];
 
-// Mock API delay
-const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
 
 export const useLeaderboard = () => {
   const [leaderboard, setLeaderboard] = useState([]);
@@ -128,17 +127,45 @@ export const useLeaderboard = () => {
         setLoading(true);
         setError(null);
         
-        // Simulate API call delay
-        await delay(1200);
-        
-        // Simulate random API failure (8% chance)
-        if (Math.random() < 0.08) {
-          throw new Error('Failed to fetch leaderboard. Please try again later.');
+        // Fetch leaderboard from Supabase
+        const { data, error } = await supabase
+          .from('scores')
+          .select(`
+            score,
+            contest_id,
+            time_taken,
+            users_public!inner(
+              name
+            )
+          `)
+          .order('score', { ascending: false })
+          .order('time_taken', { ascending: true });
+
+        if (error) {
+          throw new Error(`Failed to fetch leaderboard: ${error.message}`);
         }
-        
-        setLeaderboard(mockLeaderboard);
+
+        // Transform the data to match the expected structure
+        const transformedData = data.map((item, index) => ({
+          id: index + 1,
+          name: item.users_public.name,
+          score: item.score,
+          rank: index + 1,
+          contest_id: item.contest_id,
+          time_taken: item.time_taken,
+          // Add default values for fields that might not exist in the DB
+          school: "N/A",
+          level: "Unknown",
+          accuracy: "N/A",
+          contests_participated: 1,
+          avatar: null
+        }));
+
+        setLeaderboard(transformedData);
       } catch (err) {
         setError(err.message);
+        // Fallback to mock data in case of error
+        setLeaderboard(mockLeaderboard);
       } finally {
         setLoading(false);
       }
@@ -147,7 +174,7 @@ export const useLeaderboard = () => {
     fetchLeaderboard();
   }, []);
 
-  const getTopPlayers = (count = 5) => {
+  const getTopPlayers = (count = 8) => {
     return leaderboard.slice(0, count);
   };
 
@@ -164,16 +191,41 @@ export const useLeaderboard = () => {
       setLoading(true);
       setError(null);
       
-      // Simulate API call delay
-      await delay(800);
-      
-      // Simulate random refresh failure (3% chance)
-      if (Math.random() < 0.03) {
-        throw new Error('Failed to refresh leaderboard. Please try again.');
+      // Fetch fresh leaderboard from Supabase
+      const { data, error } = await supabase
+        .from('scores')
+        .select(`
+          score,
+          contest_id,
+          time_taken,
+          users_public!inner(
+            name
+          )
+        `)
+        .order('score', { ascending: false })
+        .order('time_taken', { ascending: true });
+
+      if (error) {
+        throw new Error(`Failed to refresh leaderboard: ${error.message}`);
       }
-      
-      // In a real app, this would fetch fresh data from the API
-      setLeaderboard([...mockLeaderboard]);
+
+      // Transform the data to match the expected structure
+      const transformedData = data.map((item, index) => ({
+        id: index + 1,
+        name: item.users_public.name,
+        score: item.score,
+        rank: index + 1,
+        contest_id: item.contest_id,
+        time_taken: item.time_taken,
+        // Add default values for fields that might not exist in the DB
+        school: "N/A",
+        level: "Unknown",
+        accuracy: "N/A",
+        contests_participated: 1,
+        avatar: null
+      }));
+
+      setLeaderboard(transformedData);
       
       return { success: true, message: 'Leaderboard refreshed successfully!' };
     } catch (err) {

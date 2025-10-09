@@ -115,7 +115,7 @@ const contestLandingPage = () => {
 
   // Get current contest (upcoming or live)
   const currentContest = getLiveContest() || getUpcomingContest();
-  const topPlayers = getTopPlayers(5);
+  const topPlayers = getTopPlayers(8);
 
   // Loading state
   const isLoading = contestsLoading || leaderboardLoading;

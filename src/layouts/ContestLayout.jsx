@@ -110,13 +110,13 @@ const ContestLayout = ({ children }) => {
       path: '/dashboard',
       action: () => navigate('/dashboard')
     },
-    {
-      id: 'leaderboard',
-      label: 'Leaderboard',
-      icon: BarChart3,
-      path: '/leaderboard',
-      action: () => navigate('/leaderboard')
-    },
+    // {
+    //   id: 'leaderboard',
+    //   label: 'Leaderboard',
+    //   icon: BarChart3,
+    //   path: '/leaderboard',
+    //   action: () => navigate('/leaderboard')
+    // },
     // Only show admin option for users with admin privileges
     ...(isAdmin ? [{
       id: 'admin',

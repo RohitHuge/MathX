@@ -429,7 +429,8 @@ const CombinedHero = ({
 
                 {leaderboard && leaderboard.length > 0 ? (
                   <div className="space-y-1 sm:space-y-2 flex-1">
-                    {leaderboard.slice(0, 5).map((player, index) => (
+                    {console.log(leaderboard)}
+                    {leaderboard.slice(0, 8).map((player, index) => (
                       <motion.div
                         key={player.id}
                         className="flex items-center space-x-2 sm:space-x-3 p-2 rounded-lg hover:bg-white/5 transition-all duration-300"
@@ -447,9 +448,9 @@ const CombinedHero = ({
                           <h4 className="text-white font-semibold text-xs sm:text-sm truncate">
                             {player.name}
                           </h4>
-                          <p className="text-[#AEAEAE] text-xs">
+                          {/* <p className="text-[#AEAEAE] text-xs">
                             {player.school || 'Student'}
-                          </p>
+                          </p> */}
                         </div>
 
                         {/* Score */}
@@ -458,7 +459,7 @@ const CombinedHero = ({
                             {player.score}
                           </div>
                           <div className="text-xs text-[#AEAEAE]">
-                            {player.accuracy || '95%'}
+                            {player.time_taken || '95%'} Seconds
                           </div>
                         </div>
                       </motion.div>

@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { useAuth } from '../../contexts/AuthContext';
+import { supabase } from '../../config/supabaseClient';
 import { useNavigate, Link } from 'react-router-dom';
 import Loader from '../../components/auth/Loader';
 import ErrorModal from '../../components/auth/ErrorModal';
@@ -78,8 +79,29 @@ const AuthPage = () => {
         
        const  res = await register(formData.name, formData.email, formData.password, formData.phone, formData.rollno);
         if (res.success) {
-        showToast('success', 'Account created successfully! Welcome to MathX!');
-          setTimeout(() => navigate('/contest'), 1500);
+          console.log('Appwrite registration success.');
+          try {
+            const { error } = await supabase.from('users_public').insert([
+              {
+                user_id: res.user.$id,
+                name: formData.name,
+                rollno: formData.rollno,
+                mobile_no: formData.phone,
+                email: formData.email
+              }
+            ]);
+            if (error) {
+              console.error('Supabase insert error:', error.message);
+              showErrorModal('Sync Error', "Couldn't sync user data. Please contact support.");
+            } else {
+              console.log('Supabase user insert success.');
+              showToast('success', 'Account created successfully 🎉');
+              setTimeout(() => navigate('/contest'), 1500);
+            }
+          } catch (supabaseError) {
+            console.error('Supabase insert error:', supabaseError.message);
+            showErrorModal('Sync Error', "Couldn't sync user data. Please contact support.");
+          }
         } else {
           showErrorModal('Registration Error', res.message);
         }

@@ -407,7 +407,7 @@ const ContestPage = () => {
     // Submit results to backend
     try {
       if (user) {
-        const result = await submitContest(contestId, user.$id, scoreData);
+        const result = await submitContest(contestId, user.$id, scoreData.totalScore);
         if (result) {
           showToast('Results submitted successfully!', 'success');
         } else {

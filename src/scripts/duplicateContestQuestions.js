@@ -1,22 +1,20 @@
-import { Client, Databases, Query, ID } from "appwrite";
-import dotenv from "dotenv";
+import { Client, Databases, Query, ID } from "node-appwrite";
 
-dotenv.config();
 
 // Appwrite credentials
 const client = new Client()
-  .setEndpoint(process.env.APPWRITE_ENDPOINT) // e.g. https://cloud.appwrite.io/v1
-  .setProject(process.env.APPWRITE_PROJECT_ID)
-  .setKey(process.env.APPWRITE_API_KEY); // requires server key
+  .setEndpoint("https://fra.cloud.appwrite.io/v1") // e.g. https://cloud.appwrite.io/v1
+  .setProject("")
+  .setKey(""); // requires server key
 
 const databases = new Databases(client);
 
 // Config — replace these IDs
-const DATABASE_ID = process.env.APPWRITE_DATABASE_ID;
+const DATABASE_ID = "";
 const QUESTIONS_COLLECTION_ID = "questions";
 
-const sourceContestId = "68f0aac01ef21030543e"; // e.g., "675abc123"
-const targetContestId = "68f4fed7e55d44957cc4"; // e.g., "675xyz789"
+const sourceContestId = ""; // e.g., "675abc123"
+const targetContestId = ""; // e.g., "675xyz789"
 const setAsDraft = true; // change to false if you want live clone
 
 async function duplicateContestQuestions() {
@@ -45,7 +43,7 @@ async function duplicateContestQuestions() {
         optionD: q.optionD,
         answer: q.answer,
         marks: q.marks,
-        status: setAsDraft ? "draft" : q.status || "active",
+        // status: setAsDraft ? "draft" : q.status || "active",
       };
 
       await databases.createDocument(

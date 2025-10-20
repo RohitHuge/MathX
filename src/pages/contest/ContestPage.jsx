@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { Client, Databases, Query } from 'appwrite';
 import ReactMarkdown from 'react-markdown';
 import remarkMath from 'remark-math';
@@ -22,7 +22,7 @@ import {
   ChevronRight
 } from 'lucide-react';
 import { appwriteEndpoint, appwriteProjectId, appwriteDatabaseId } from '../../../config.js';
-import { submitContestResults } from '../../utils/contestSubmission.js';
+import { supabase } from '../../config/supabaseClient.js';
 import Toast from '../../components/landing/Toast';
 
 // Appwrite configuration
@@ -66,6 +66,7 @@ const Markdown = ({ text }) => {
     }
     return s;
   };
+
   const safeText = normalizeMathDelimiters(text);
   return (
     <ReactMarkdown
@@ -81,6 +82,8 @@ const ContestPage = () => {
   const { contestId } = useParams();
   const navigate = useNavigate();
   const { user } = useAuth();
+  const location = useLocation();
+  const forceStart = new URLSearchParams(location.search).get('forceStart') === '1';
   const { loading: scoreLoading, error: scoreError, getUserContestScore, startContest, submitContest } = useContestScore();
   
   // State management
@@ -94,9 +97,10 @@ const ContestPage = () => {
   const [timeRemaining, setTimeRemaining] = useState(0);
   const [startTime, setStartTime] = useState(null);
   const [score, setScore] = useState(null);
-  const [submitted, setSubmitted] = useState(false);
+  const [isSubmitted, setIsSubmitted] = useState(false);
   const [existingScore, setExistingScore] = useState(null);
   const [endAt, setEndAt] = useState(null);
+  const [isSaving, setIsSaving] = useState(false);
   
   // Anti-cheating state
   const [isFullscreen, setIsFullscreen] = useState(false);
@@ -113,6 +117,7 @@ const ContestPage = () => {
   
   const contestRef = useRef(null);
   const timerRef = useRef(null);
+  const workerRef = useRef(null);
 
   // Show toast message
   const showToast = (message, type = 'info') => {
@@ -120,9 +125,26 @@ const ContestPage = () => {
     setTimeout(() => setToast({ show: false, message: '', type: 'info' }), 3000);
   };
 
+  // Calculate current score quickly for auto-save
+  const calculateCurrentScore = () => {
+    let totalScore = 0;
+    questions.forEach(q => {
+      const userAnswer = answers[q.$id];
+      if (userAnswer === q.answer) {
+        totalScore += q.marks;
+      }
+    });
+    return totalScore;
+  };
+
   // Helpers
   const getContestDurationMs = (durationMinutes) => {
-    const n = Number(durationMinutes);
+    // Accept numbers or strings like "20" or "20 minutes"
+    let n = Number(durationMinutes);
+    if (!Number.isFinite(n)) {
+      const match = String(durationMinutes || '').match(/\d+/);
+      if (match) n = Number(match[0]);
+    }
     return Number.isFinite(n) && n > 0 ? n * 60 * 1000 : 0;
   };
 
@@ -259,57 +281,27 @@ const ContestPage = () => {
         const contestDuration = getContestDurationMs(contestResponse.contestDuration);
         const endTime = new Date(startTime.getTime() + contestDuration);
         
-        if (now < startTime) {
+        if (now < startTime && !forceStart) {
           // Contest hasn't started yet
+          console.log('[Contest] Not started yet. Now < startTime', { now: now.toISOString(), startTime: startTime.toISOString() });
           setShowInstructions(true);
           setLoading(false);
           return;
         }
         
-        if (now > endTime) {
+        if (now > endTime && !forceStart) {
           // Contest has ended
+          console.log('[Contest] Already ended. Now > endTime', { now: now.toISOString(), endTime: endTime.toISOString() });
           setContestEnded(true);
           setLoading(false);
           return;
         }
-        
-        // Check for existing score record if user is logged in
-        if (user) {
-          const existingScoreRecord = await getUserContestScore(contestId, user.$id);
-          if (existingScoreRecord) {
-            setExistingScore(existingScoreRecord);
-            
-            // If the contest was already submitted, show the score
-            if (existingScoreRecord.end_time) {
-              setContestEnded(true);
-              setSubmitted(true);
-              setScore({
-                totalScore: existingScoreRecord.score,
-                percentage: existingScoreRecord.score
-              });
-            } else {
-              // Calculate remaining time based on start_time
-              const elapsedTime = now - new Date(existingScoreRecord.start_time);
-              const remainingTime = Math.max(0, contestDuration - elapsedTime);
-              
-              if (remainingTime > 0) {
-                setTimeRemaining(remainingTime);
-                setStartTime(new Date(existingScoreRecord.start_time));
-                setEndAt(new Date(new Date(existingScoreRecord.start_time).getTime() + contestDuration));
-                setContestStarted(true);
-                showToast('Resuming your previous attempt', 'info');
-              } else {
-                // Time has expired, auto-submit
-                handleAutoSubmit();
-              }
-            }
-          }
+        if (forceStart) {
+          console.log('[Contest] DEV forceStart=1 - bypassing schedule checks');
+          setContestEnded(false);
         }
-        
-        // Show instructions if no existing score
-        if (!existingScore) {
-          setShowContestInstructions(true);
-        }
+        // Fresh start path: show contest instructions
+        setShowContestInstructions(true);
         
         setLoading(false);
         
@@ -325,30 +317,56 @@ const ContestPage = () => {
     }
   }, [contestId]);
 
-  // Timer countdown
+  const initTimerWithWorker = (durationMs) => {
+    try {
+      if (!durationMs || durationMs <= 0) { console.log('[Timer] Not initializing: duration invalid', durationMs); return; }
+      // terminate existing, if any
+      if (workerRef.current) {
+        console.log('[Timer] Existing worker found. Terminating before init.');
+        try { workerRef.current.terminate(); } catch {}
+        workerRef.current = null;
+      }
+      console.log('[Timer] Creating worker with durationMs:', durationMs);
+      workerRef.current = new Worker(new URL('../../workers/timerWorker.js', import.meta.url));
+      setTimeRemaining(durationMs);
+      const endAtLocal = new Date(Date.now() + durationMs);
+      setEndAt(endAtLocal);
+      console.log('[Timer] Posting start to worker');
+      workerRef.current.postMessage({ command: 'start', duration: durationMs });
+      workerRef.current.onmessage = (e) => {
+        if (e?.data?.type === 'tick') {
+          console.log('[Timer] tick from worker, remaining(ms):', e.data.remaining);
+          setTimeRemaining(Math.max(0, e.data.remaining));
+        }
+        if (e?.data?.type === 'end') {
+          console.log('[Timer] end from worker');
+          handleAutoSubmit();
+        }
+      };
+      workerRef.current.onerror = (ev) => {
+        console.error('[Timer] worker error:', ev.message || ev);
+      };
+    } catch (err) {
+      console.error('[Timer] Worker failed to initialize:', err);
+    }
+  };
+
+  // Web Worker based countdown timer
   useEffect(() => {
-    if (timerRef.current) {
-      clearInterval(timerRef.current);
-      timerRef.current = null;
-    }
-    if (contestStarted && !contestEnded && timeRemaining > 0) {
-      timerRef.current = setInterval(() => {
-        setTimeRemaining(prev => {
-          if (prev <= 1000) {
-            handleAutoSubmit();
-            return 0;
-          }
-          return prev - 1000;
-        });
-      }, 1000);
-    }
+    if (!contestStarted) { console.log('[Timer] Skipping init: contest not started'); return; }
+    if (contestEnded) { console.log('[Timer] Skipping init: contest ended'); return; }
+    if (isSubmitted) { console.log('[Timer] Skipping init: already submitted'); return; }
+    const durationMs = contest ? getContestDurationMs(contest.contestDuration) : 0;
+    if (!durationMs) { console.log('[Timer] Skipping init: invalid duration'); return; }
+    initTimerWithWorker(durationMs);
     return () => {
-      if (timerRef.current) {
-        clearInterval(timerRef.current);
-        timerRef.current = null;
+      if (workerRef.current) {
+        console.log('[Timer] Terminating worker');
+        try { workerRef.current.terminate(); } catch (e) { console.error('[Timer] terminate error:', e); }
+        workerRef.current = null;
       }
     };
-  }, [contestStarted, contestEnded, timeRemaining]);
+  }, [contestStarted, contestEnded, isSubmitted, contest]);
 
   // Format time remaining
   const formatTime = (milliseconds) => {
@@ -394,65 +412,149 @@ const ContestPage = () => {
 
   // Auto submit when time's up
   const handleAutoSubmit = async () => {
-    if (submitted) return;
-    
-    setContestEnded(true);
-    setSubmitted(true);
-    
-    const scoreData = calculateScore();
-    setScore(scoreData);
-    
-    showToast('Time\'s up! Contest submitted automatically.', 'info');
-    
-    // Submit results to backend
-    try {
-      if (user) {
-        const result = await submitContest(contestId, user.$id, scoreData.totalScore);
-        if (result) {
-          showToast('Results submitted successfully!', 'success');
-        } else {
-          showToast('Failed to submit results. Please try again.', 'error');
-        }
-      }
-    } catch (error) {
-      console.error('Submission error:', error);
-      showToast('Error submitting results', 'error');
-    }
+    if (isSubmitted) return;
+    console.log('[Submit][AUTO] Triggered auto-submit');
+    await handleSubmit(true);
   };
 
-  // Manual submit - invoked after confirmation
-  const handleConfirmSubmit = async () => {
-    if (submitted) return;
-    
-    setContestEnded(true);
-    setSubmitted(true);
-    
-    const scoreData = calculateScore();
-    setScore(scoreData);
-    
-    showToast('Contest submitted successfully!', 'success');
-    
-    // Submit results to backend
+  // Manual submission to finalize contest
+  const handleSubmit = async (isAuto = false) => {
     try {
-      if (user) {
-        const result = await submitContest(contestId, user.$id, scoreData.totalScore);
-        if (result) {
-          showToast('Results submitted successfully!', 'success');
-        } else {
-          showToast('Failed to submit results. Please try again.', 'error');
-        }
+      if (!user || !contestId) return;
+      if (isSubmitted) return;
+
+      // Stop worker to avoid double trigger
+      if (workerRef.current) {
+        try { workerRef.current.terminate(); } catch {}
+        workerRef.current = null;
+        console.log('[Submit] Worker terminated before final submit');
       }
-    } catch (error) {
-      console.error('Submission error:', error);
+
+      // Snapshot for debugging
+      const answersSnapshot = { ...answers };
+      const qCount = Array.isArray(questions) ? questions.length : 0;
+      const selectedCount = Object.keys(answersSnapshot).length;
+      const finalScoreQuick = calculateCurrentScore();
+      const finalScoreData = calculateScore();
+      console.log('[Submit] Snapshot', { isAuto, qCount, selectedCount, finalScoreQuick, finalScoreData });
+
+      // Prevent duplicate submissions by flipping local flags early
+      setIsSubmitted(true);
+      setContestEnded(true);
+
+      // Read current semi_score to guard against any last-moment tick differences
+      const { data: existingRows, error: readErr } = await supabase
+        .from('scores')
+        .select('semi_score')
+        .eq('user_id', user.$id)
+        .eq('contest_id', contestId);
+      if (readErr) {
+        console.warn('[Submit] Could not read semi_score before finalize:', readErr);
+      }
+      const semi = Array.isArray(existingRows) && existingRows.length ? Number(existingRows[0].semi_score || 0) : 0;
+      const finalToStore = Math.max(Number(finalScoreQuick || 0), Number(semi || 0));
+      console.log('[Submit] Final store value (max of quick and semi):', { finalScoreQuick, semi, finalToStore });
+
+      // Reflect the stored score in UI results
+      setScore({ ...finalScoreData, totalScore: finalToStore });
+
+      const { error: upErr } = await supabase
+        .from('scores')
+        .update({
+          score: finalToStore,
+          end_time: new Date().toISOString(),
+        })
+        .eq('user_id', user.$id)
+        .eq('contest_id', contestId);
+
+      if (upErr) {
+        console.error('Final submit error:', upErr);
+        showToast('Failed to submit results. Please try again.', 'error');
+        return;
+      }
+
+      showToast(isAuto ? "Time's up! Contest submitted automatically ⏱️" : 'Contest submitted successfully ✅', 'success');
+      console.log('🧮 Final score submitted', { auto: isAuto, scoreQuick: finalScoreQuick, semi, stored: finalToStore, detailed: finalScoreData.totalScore });
+    } catch (e) {
+      console.error('Submission error:', e);
       showToast('Error submitting results', 'error');
     }
   };
 
   // Open confirmation before manual submit
-  const handleSubmit = () => {
-    if (submitted) return;
+  const openSubmitConfirm = () => {
+    if (isSubmitted) return;
     setShowSubmitConfirm(true);
   };
+
+  // Confirm modal action
+  const handleConfirmSubmit = async () => {
+    if (isSubmitted) return;
+    await handleSubmit(false);
+  };
+
+  // 20s semi-score auto-updater
+  useEffect(() => {
+    if (!user || !contestStarted || contestEnded || isSubmitted) return;
+    const interval = setInterval(() => {
+      saveSemiScore();
+    }, 20000);
+    return () => clearInterval(interval);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user, contestStarted, contestEnded, isSubmitted, answers, questions]);
+
+  const saveSemiScore = async () => {
+    try {
+      if (!user || !contestId) return;
+      if (isSubmitted || contestEnded) return;
+      const currentScore = calculateCurrentScore();
+      setIsSaving(true);
+      const { error: semiErr } = await supabase
+        .from('scores')
+        .update({
+          semi_score: currentScore,
+          semi_time: new Date().toISOString(),
+        })
+        .eq('user_id', user.$id)
+        .eq('contest_id', contestId);
+      setIsSaving(false);
+      if (semiErr) {
+        console.error('Semi-score update error:', semiErr);
+        return;
+      }
+      const stamp = new Date().toLocaleTimeString();
+      showToast(`✅ Semi-score updated at ${stamp}`, 'success');
+      console.log('✅ Semi-score updated', { at: stamp, score: currentScore });
+    } catch (e) {
+      setIsSaving(false);
+      console.error('Semi-score exception:', e);
+    }
+  };
+
+  // Supabase Realtime listener for auto-submission by backend
+  useEffect(() => {
+    if (!user) return;
+    const channel = supabase
+      .channel('auto-submit-listener')
+      .on(
+        'postgres_changes',
+        { event: 'UPDATE', schema: 'public', table: 'scores', filter: `user_id=eq.${user.$id}` },
+        (payload) => {
+          const updated = payload.new;
+          if (updated && updated.end_time && !isSubmitted) {
+            setIsSubmitted(true);
+            setContestEnded(true);
+            showToast('⚡ Submission finalized via Realtime', 'info');
+            console.log('⚡ Submission finalized via Realtime payload', updated);
+          }
+        }
+      )
+      .subscribe();
+    return () => {
+      try { supabase.removeChannel(channel); } catch {}
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user, isSubmitted]);
 
   // Handle refresh for pre-contest
   const handleRefresh = () => {
@@ -469,40 +571,22 @@ const ContestPage = () => {
       
       await requestFullscreen();
       const now = new Date();
-      
-      // Check existing attempt
-      let scoreRecord = await getUserContestScore(contestId, user.$id);
-      if (scoreRecord && scoreRecord.end_time) {
-        // Already submitted – jump to results
-        setContestEnded(true);
-        setSubmitted(true);
-        setScore({
-          totalScore: scoreRecord.score,
-          percentage: scoreRecord.score
-        });
-        setShowContestInstructions(false);
-        showToast('You have already submitted. Showing results.', 'info');
-        return;
-      }
-
-      // Create record if none; otherwise reuse existing open attempt
-      if (!scoreRecord) {
-        scoreRecord = await startContest(contestId, user.$id);
-      }
-      if (!scoreRecord) {
-        throw new Error('Failed to create score record');
-      }
-      
-      // Initialize or resume timer from recorded start_time BEFORE flipping started flag
+      // Optionally ensure a score record exists; ignore if it already exists
+      try { await startContest(contestId, user.$id); } catch (e) { /* ignore duplicate */ }
+      // Always start fresh timer for full duration
       const durationMs = contest ? getContestDurationMs(contest.contestDuration) : 0;
       if (durationMs > 0) {
-        const startedAt = scoreRecord.start_time ? new Date(scoreRecord.start_time) : now;
-        const elapsed = now - startedAt;
-        setTimeRemaining(Math.max(0, durationMs - elapsed));
-        setEndAt(new Date(startedAt.getTime() + durationMs));
+        setTimeRemaining(durationMs);
+        setEndAt(new Date(now.getTime() + durationMs));
       }
+      // Ensure fresh state so timer effect doesn't skip
+      setIsSubmitted(false);
+      setContestEnded(false);
       setStartTime(now);
+      console.log('[Contest] Start clicked. Starting fresh session with durationMs:', durationMs, 'contest:', contest);
       setContestStarted(true);
+      // start immediately
+      initTimerWithWorker(durationMs);
       setShowContestInstructions(false);
     } catch (error) {
       console.error('Error starting contest:', error);
@@ -964,14 +1048,14 @@ const ContestPage = () => {
           {/* Submit Button */}
           <div className="mt-4 lg:mt-8">
             <motion.button
-          onClick={handleSubmit}
-              disabled={submitted}
+              onClick={openSubmitConfirm}
+              disabled={isSubmitted}
               className="w-full bg-gradient-to-r from-[#A146D4] to-[#49E3FF] text-white py-2 lg:py-4 px-4 lg:px-8 rounded-lg lg:rounded-xl font-semibold text-sm lg:text-lg hover:shadow-xl transition-all duration-300 flex items-center justify-center space-x-2 disabled:opacity-50 disabled:cursor-not-allowed"
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.98 }}
             >
               <Trophy className="w-4 h-4 lg:w-5 lg:h-5" />
-              <span>{submitted ? 'Submitted' : 'Submit Contest'}</span>
+              <span>{isSaving ? 'Saving...' : isSubmitted ? 'Submitted' : 'Submit Contest'}</span>
             </motion.button>
           </div>
         </div>

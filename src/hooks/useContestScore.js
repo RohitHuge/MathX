@@ -20,11 +20,12 @@ export const useContestScore = () => {
         .from('scores')
         .select('*')
         .eq('contest_id', contestId)
-        .eq('user_id', userId)
-        .single();
+        .eq('user_id', userId);
 
       if (error) throw error;
-      return data;
+      if (!data || data.length === 0) return null;
+      return data[0];
+
     } catch (err) {
       console.error('Error fetching contest score:', err);
       setError('Failed to fetch contest score');
@@ -51,20 +52,24 @@ export const useContestScore = () => {
       }
 
       const { data, error } = await supabase
-        .from('scores')
-        .insert([
-          {
-            contest_id: contestId,
-            user_id: userId,
-            start_time: new Date().toISOString()
-          }
-        ])
-        .select()
-        .single();
+          .from('scores')
+          .insert([
+            {
+              contest_id: contestId,
+              user_id: userId,
+              start_time: new Date().toISOString()
+            }
+          ])
+          .select();
 
-      if (error) throw error;
-      console.log('Contest started:', data);
-      return data;
+        if (error) throw error;
+
+        const newRecord = Array.isArray(data) ? data[0] : data;
+        return newRecord;
+
+      // if (error) throw error;
+      // console.log('Contest started:', data);
+      // return data;
     } catch (err) {
       console.error('Error starting contest:', err);
       setError('Failed to start contest');
@@ -101,7 +106,7 @@ export const useContestScore = () => {
         .eq('contest_id', contestId)
         .eq('user_id', userId)
         .select()
-        .single();
+        .maybeSingle();
 
       if (error) {
         console.error('Supabase error:', error);

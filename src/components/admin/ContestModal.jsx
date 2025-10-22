@@ -70,12 +70,6 @@ const ContestModal = ({ isOpen, onClose, onSave, contest }) => {
 
     if (!formData.startTime) {
       newErrors.startTime = 'Start time is required';
-    } else {
-      const startDate = new Date(formData.startTime);
-      const now = new Date();
-      if (startDate <= now) {
-        newErrors.startTime = 'Start time must be in the future';
-      }
     }
 
     if (formData.eventDuration <= 0) {

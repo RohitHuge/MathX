@@ -561,6 +561,25 @@ const ContestPage = () => {
     window.location.reload();
   };
 
+  const scheduleAutoSubmit = async (userId, contestId, contestDurationSeconds) => {
+  try {
+    const res = await fetch("https://almxadlystsilsxaunts.supabase.co/functions/v1/autoSubmit", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        user_id: userId,
+        contest_id: contestId,
+        contest_duration: contestDurationSeconds
+      }),
+    });
+
+    if (!res.ok) throw new Error(`Failed with status ${res.status}`);
+    console.log(`✅ AutoSubmit scheduled for ${contestId}, waiting ${contestDurationSeconds + 10}s`);
+  } catch (err) {
+    console.error("❌ Could not call autoSubmit Edge Function:", err);
+  }
+};
+
   // Handle accepting contest instructions and requesting fullscreen
   const handleAcceptInstructions = async () => {
     try {
@@ -578,6 +597,14 @@ const ContestPage = () => {
       if (durationMs > 0) {
         setTimeRemaining(durationMs);
         setEndAt(new Date(now.getTime() + durationMs));
+      }
+      // Fire-and-forget: schedule backend auto-submit (does not block UI)
+      try {
+        const contestDurationSeconds = Math.max(1, Math.round(durationMs / 1000));
+        console.log('[Contest] Calling scheduleAutoSubmit with', { userId: user.$id, contestId, contestDurationSeconds });
+        scheduleAutoSubmit(user.$id, contestId, contestDurationSeconds);
+      } catch (e) {
+        console.warn('[Contest] scheduleAutoSubmit error (non-blocking):', e);
       }
       // Ensure fresh state so timer effect doesn't skip
       setIsSubmitted(false);

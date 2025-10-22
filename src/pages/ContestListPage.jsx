@@ -57,16 +57,35 @@ const ContestListPage = () => {
       setLoading(true);
       setError(null);
 
+      let response;
+      // console.log(user);
+      // console.log(`user label: ${user.labels[0]}`);
+
       // Fetch contests from Appwrite database
-      const response = await databases.listDocuments(
-        appwriteDatabaseId, // Replace with your database ID
-        'contest_info', // Replace with your collection ID
-        [
-          Query.notEqual('status', 'deleted'),
-          Query.notEqual('status', 'draft'),
-          Query.orderDesc('$createdAt')
-        ]
-      );
+      if (user.labels[0] == 'mvp' || user.labels[0] === 'admin') {
+        response = await databases.listDocuments(
+          appwriteDatabaseId, // Replace with your database ID
+          'contest_info', // Replace with your collection ID
+          [
+            Query.notEqual('status', 'deleted'),
+            Query.notEqual('status', 'draft'),
+            Query.orderDesc('$createdAt')
+          ]
+        );
+       
+      } else {
+         response = await databases.listDocuments(
+          appwriteDatabaseId, // Replace with your database ID
+          'contest_info', // Replace with your collection ID
+          [
+            Query.notEqual('status', 'deleted'),
+            Query.notEqual('status', 'draft'),
+            Query.notEqual('status', 'test'),
+            Query.orderDesc('$createdAt')
+          ]
+        );
+        
+      }
 
       // Process and classify contests
       const processedContests = response.documents.map(contest => ({

@@ -1,43 +1,26 @@
-// Supabase Edge Function: autoSubmit
-// ---------------------------------------------------
-// Purpose: Wait for the contest duration, then finalize scores if not submitted.
-
 import "jsr:@supabase/functions-js/edge-runtime.d.ts";
 import { serve } from "std/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
-// Utility function for waiting (sleep)
-const delay = (ms: number) => new Promise((res) => setTimeout(res, ms));
+const corsHeaders = {
+  "Access-Control-Allow-Origin": "*",
+  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
+  "Access-Control-Allow-Methods": "POST, OPTIONS",
+};
 
 serve(async (req) => {
+  // Handle CORS preflight requests
+  if (req.method === "OPTIONS") {
+    return new Response("ok", { headers: corsHeaders });
+  }
+
   try {
-    const corsHeaders = {
-      "Access-Control-Allow-Origin": "*",
-      "Access-Control-Allow-Methods": "POST, OPTIONS",
-      "Access-Control-Allow-Headers": "authorization, content-type",
-    } as const;
-
-    if (req.method === "OPTIONS") {
-      return new Response("ok", { headers: corsHeaders });
-    }
-
-    if (req.method !== "POST") {
-      return new Response("Method Not Allowed", { status: 405, headers: corsHeaders });
-    }
-
     const supabase = createClient(
       Deno.env.get("SUPABASE_URL")!,
-      Deno.env.get("SERVICE_ROLE_KEY")! // renamed key as discussed
+      Deno.env.get("SERVICE_ROLE_KEY")!
     );
 
-    let body: any = null;
-    try {
-      body = await req.json();
-    } catch (_e) {
-      return new Response("Invalid JSON body", { status: 400, headers: corsHeaders });
-    }
-
-    const { user_id, contest_id, contest_duration } = body || {};
+    const { user_id, contest_id, contest_duration } = await req.json();
 
     if (!user_id || !contest_id || !contest_duration) {
       return new Response("Missing required fields", { status: 400, headers: corsHeaders });
@@ -47,12 +30,11 @@ serve(async (req) => {
       `🚀 AutoSubmit scheduled for user ${user_id} | contest ${contest_id} | duration ${contest_duration}s`
     );
 
-    // 1️⃣ Wait for contest duration + 10 seconds
-    const waitTime = contest_duration * 1000 + 10000;
-    console.log(`⏱️ Waiting ${waitTime / 1000}s before checking submission...`);
-    await delay(waitTime);
+    // Wait contest_duration + 10 seconds
+    const delay = (ms: number) => new Promise((res) => setTimeout(res, ms));
+    await delay(contest_duration * 1000 + 10000);
 
-    // 2️⃣ Fetch current score record
+    // Fetch the score record
     const { data: record, error: fetchError } = await supabase
       .from("scores")
       .select("*")
@@ -62,21 +44,16 @@ serve(async (req) => {
 
     if (fetchError) throw fetchError;
     if (!record) {
-      return new Response("No record found for this user/contest", { status: 404, headers: corsHeaders });
+      return new Response("No record found", { status: 404, headers: corsHeaders });
     }
 
-    // 3️⃣ If already submitted, skip
     if (record.end_time) {
-      console.log(`✅ Already submitted for ${user_id}`);
       return new Response("Already submitted", { status: 200, headers: corsHeaders });
     }
 
-    // 4️⃣ Use semi-score as fallback
     const finalScore = record.score || record.semi_score || 0;
-    const finalTime =
-      record.end_time || record.semi_time || new Date().toISOString();
+    const finalTime = record.end_time || record.semi_time || new Date().toISOString();
 
-    // 5️⃣ Update final record
     const { error: updateError } = await supabase
       .from("scores")
       .update({
@@ -90,17 +67,17 @@ serve(async (req) => {
 
     if (updateError) throw updateError;
 
-    console.log(
-      `✅ Auto-submitted for user: ${user_id} | contest: ${contest_id} | score: ${finalScore}`
-    );
+    console.log(`✅ Auto-submitted for user: ${user_id} | contest: ${contest_id}`);
 
-    return new Response("Auto-submitted successfully", { status: 200, headers: corsHeaders });
+    return new Response("Auto-submitted successfully", {
+      status: 200,
+      headers: corsHeaders,
+    });
   } catch (err) {
     console.error("❌ AutoSubmit error:", err.message);
-    return new Response(`Internal Server Error: ${err.message}`, { status: 500, headers: {
-      "Access-Control-Allow-Origin": "*",
-      "Access-Control-Allow-Methods": "POST, OPTIONS",
-      "Access-Control-Allow-Headers": "authorization, content-type",
-    }});
+    return new Response(`Internal Server Error: ${err.message}`, {
+      status: 500,
+      headers: corsHeaders,
+    });
   }
 });

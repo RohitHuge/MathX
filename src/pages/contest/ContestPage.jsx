@@ -563,18 +563,15 @@ const ContestPage = () => {
 
   const scheduleAutoSubmit = async (userId, contestId, contestDurationSeconds) => {
   try {
-    const res = await fetch("https://almxadlystsilsxaunts.supabase.co/functions/v1/autoSubmit", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
+    const { data, error } = await supabase.functions.invoke('autoSubmit', {
+      body: {
         user_id: userId,
         contest_id: contestId,
-        contest_duration: contestDurationSeconds
-      }),
+        contest_duration: contestDurationSeconds,
+      },
     });
-
-    if (!res.ok) throw new Error(`Failed with status ${res.status}`);
-    console.log(`✅ AutoSubmit scheduled for ${contestId}, waiting ${contestDurationSeconds + 10}s`);
+    if (error) throw error;
+    console.log(`✅ AutoSubmit scheduled for ${contestId}, waiting ${contestDurationSeconds + 10}s`, data);
   } catch (err) {
     console.error("❌ Could not call autoSubmit Edge Function:", err);
   }

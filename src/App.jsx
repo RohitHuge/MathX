@@ -14,6 +14,7 @@ import ContestPage from './pages/contest/ContestPage'
 import ContestLayout from './layouts/ContestLayout'
 import ContestManagement from './pages/admin/ContestManagement'
 import AdminRoute from './components/admin/AdminRoute'
+import CodingEnvironment from './coding/pages/CodingEnvironment'
 
 function App() {
   return (
@@ -52,6 +53,7 @@ function App() {
               </AdminRoute>
             </ContestLayout>
           } />
+          <Route path='/coding' element={<CodingEnvironment />} />
         </Routes>
       </BrowserRouter>
     </AuthProvider>

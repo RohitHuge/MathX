@@ -48,6 +48,7 @@ serve(async (req) => {
     }
 
     if (record.end_time) {
+      console.log(`Already submitted for user: ${user_id} | contest: ${contest_id}`);
       return new Response("Already submitted", { status: 200, headers: corsHeaders });
     }
 

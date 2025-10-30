@@ -1,0 +1,9 @@
+export const sampleProblems = [
+  {
+    id: "p1",
+    title: "Sum of Primes",
+    description: "Given n, print sum of all prime numbers up to n.",
+    sample_input: "20",
+    expected_output: "77",
+  },
+];

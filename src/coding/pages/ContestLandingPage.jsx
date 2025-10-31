@@ -39,7 +39,7 @@ export default function ContestLandingPage() {
       <div className="flex flex-col items-center justify-center h-[80vh] text-center">
         <h1 className="text-8xl md:text-6xl font-bold text-[#00FFC6] mb-3">MathX</h1>
         <h1 className="text-3xl md:text-4xl font-extrabold text-[#00FFC6] mb-3">
-          🏁 Clash of Code Waiting Room
+          🏁 Clash of Coders Waiting Room
         </h1>
         <p className="text-gray-300 mb-4">{message || "Awaiting next round…"}</p>
 

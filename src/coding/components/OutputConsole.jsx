@@ -15,9 +15,9 @@
          <span className="text-sm text-[#00FFC6] font-semibold">Output</span>
          {verdict && (
            <span className={`text-sm font-bold ${
-             verdict === "Accepted" ? "text-emerald-400" : "text-red-400"
+             verdict === 1 ? "text-emerald-400" : "text-red-400"
            }`}>
-             {verdict === "Accepted" ? "✅ Accepted" : "❌ Wrong Answer"}
+             {verdict === 1 ? "✅ Accepted" : "❌ Wrong Answer"}
            </span>
          )}
        </div>

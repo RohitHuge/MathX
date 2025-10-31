@@ -118,3 +118,19 @@ export async function getContestEndTime() {
     return null;
   }
 }
+
+
+export async function getUserSubmissions(userId, round) {
+  try {
+    const { data, error } = await supabase
+      .from("submissions")
+      .select("submission_id, code, output, status, submitted_at")
+      .eq("user_id", userId)
+      .eq("round_no", round);
+    if (error) throw error;
+    return data || [];
+  } catch (e) {
+    console.error("getUserSubmissions error:", e);
+    return [];
+  }
+}

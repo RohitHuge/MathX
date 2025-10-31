@@ -4,7 +4,7 @@
  import CodeEditor from "../components/CodeEditor";
  import OutputConsole from "../components/OutputConsole";
  import { useContestStageContext } from "../context/ContestStageContext";
- import { getUserProblem, saveSubmission } from "../utils/supabaseHelpers";
+ import { getUserProblem, saveSubmission, getUserSubmissions } from "../utils/supabaseHelpers";
  import useJudge0 from "../hooks/useJudge0";
  import { useAuth } from "../../contexts/AuthContext";
  
@@ -17,8 +17,11 @@
    const [loadingProblem, setLoadingProblem] = useState(true);
    const [code, setCode] = useState(`#include <stdio.h>\n\nint main() {\n    // Your code here\n    return 0;\n}\n`);
    const [customInput, setCustomInput] = useState("");
+   const [submissions, setSubmissions] = useState([]);
    const { loading: running, result, run } = useJudge0();
    const expectedOutput = useMemo(() => problem?.sample_output ?? "", [problem]);
+   const [showCondingEnvironment, setShowCondingEnvironment] = useState(true);
+   
  
    useEffect(() => {
      let mounted = true;
@@ -30,6 +33,20 @@
          setProblem(p);
          setCustomInput(p?.sample_input ?? "");
          setLoadingProblem(false);
+       }
+     })();
+     return () => { mounted = false; };
+   }, [userId, round]);
+
+   useEffect(() => {
+     let mounted = true;
+     (async () => {
+       if (!userId || !round) return;
+       const subs = await getUserSubmissions(userId, Number(round));
+       if (mounted) {
+         setSubmissions(subs);
+         console.log("Submissions:", subs);
+         setShowCondingEnvironment(false);
        }
      })();
      return () => { mounted = false; };
@@ -52,6 +69,7 @@
  
    return (
      <ContestLayout>
+      {showCondingEnvironment ? (
        <div className="min-h-screen bg-[#0B1120] text-white px-4 md:px-6 py-4">
          <div className="flex items-center justify-between mb-4">
            <Timer />
@@ -118,7 +136,14 @@
              />
            </div>
          </div>
-       </div>
+       </div>) : (
+         <div className="min-h-screen bg-[#0B1120] text-white px-4 md:px-6 py-4">
+           <div className="flex items-center justify-between mb-4">
+             <Timer />
+           </div>
+
+         </div>
+       )}
      </ContestLayout>
    );
  }

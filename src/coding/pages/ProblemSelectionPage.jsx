@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from "react";
+import React, { useState } from "react";
 import { useContestStageContext } from "../context/ContestStageContext";
 import useProblemSelection from "../hooks/useProblemSelection";
 import ProblemDisplay from "../components/ProblemDisplay";
@@ -10,8 +10,6 @@ export default function ProblemSelectionPage() {
   const { problems, selectedProblem, loading, selectProblem, confirmSelection, locked } = useProblemSelection(round);
   const [confirmOpen, setConfirmOpen] = useState(false);
   const [pending, setPending] = useState(null);
-
-  const isSelectionStage = useMemo(() => (stageCode || "").startsWith("B"), [stageCode]);
 
   const handleSelect = (p) => {
     if (locked) return;
@@ -44,15 +42,13 @@ export default function ProblemSelectionPage() {
             <p className="text-gray-300 text-sm mt-2">{selectedProblem.description}</p>
             <span className="block text-sm text-gray-400 mt-3">Waiting for next stage…</span>
           </div>
-        ) : isSelectionStage ? (
+        ) : (
           <ProblemDisplay
             problems={problems}
             selectedId={selectedProblem?.id ?? selectedProblem?.problem_id}
             locked={!!locked}
             onSelect={handleSelect}
           />
-        ) : (
-          <div className="text-gray-300">Selection is currently closed.</div>
         )}
       </div>
 

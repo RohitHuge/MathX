@@ -1,12 +1,14 @@
 import { useEffect, useMemo, useState } from "react";
 import { supabase } from "../../config/supabaseClient";
 import { getProblemsByRound, getUserChoice, saveUserChoice } from "../utils/supabaseHelpers";
+import { useAuth } from "../../contexts/AuthContext";
 
 export default function useProblemSelection(round) {
   const [problems, setProblems] = useState([]);
   const [selectedProblem, setSelectedProblem] = useState(null);
   const [loading, setLoading] = useState(true);
   const [locked, setLocked] = useState(false);
+  const { user, isAuthenticated } = useAuth();
 
   const roundNo = useMemo(() => Number(round) || null, [round]);
 
@@ -21,8 +23,7 @@ export default function useProblemSelection(round) {
         if (active) setProblems(Array.isArray(list) ? list : []);
 
         // load existing choice
-        const { data: auth } = await supabase.auth.getUser();
-        const userId = auth?.user?.id || auth?.user?.id || auth?.user?.id; // consistent
+        const userId = user?.$id;
         if (userId) {
           const choice = await getUserChoice(userId, roundNo);
           if (choice?.problem) {
@@ -48,12 +49,15 @@ export default function useProblemSelection(round) {
   };
 
   const confirmSelection = async (problemId) => {
+    // console.log("Confirming selection...");
     if (!roundNo || !problemId) return { ok: false, error: "Invalid data" };
     try {
-      const { data: auth } = await supabase.auth.getUser();
-      const userId = auth?.user?.id;
+      const userId = user?.$id;
+      console.log("User:", user);
+      console.log("User ID:", userId);
       if (!userId) return { ok: false, error: "Not authenticated" };
       const res = await saveUserChoice(userId, roundNo, problemId);
+      console.log("Save result:", res);
       if (res?.ok) {
         const chosen = problems.find((p) => p.id === problemId || p.problem_id === problemId);
         if (chosen) setSelectedProblem(chosen);

@@ -1,68 +1,55 @@
  import { useEffect, useState } from "react";
- import { useContestStageContext } from "../context/ContestStageContext";
- import ContestLayout from "../layouts/ContestLayout";
- import ContestRulesModal from "../components/modals/ContestRulesModal";
- import { getUserChoice } from "../utils/supabaseHelpers";
- import { supabase } from "../../config/supabaseClient";
+import { useContestStageContext } from "../context/ContestStageContext";
+import ContestLayout from "../layouts/ContestLayout";
+import ContestRulesModal from "../components/modals/ContestRulesModal";
+import { getUserChoice } from "../utils/supabaseHelpers";
+import { supabase } from "../../config/supabaseClient";
+import { useAuth } from "../../contexts/AuthContext";
 
- export default function ContestLandingPage() {
-  const { stageCode, message, round } = useContestStageContext();
-  const isWaiting = stageCode?.startsWith("A");
-  const [lockedProblem, setLockedProblem] = useState(null);
+export default function ContestLandingPage() {
+  const { message, round } = useContestStageContext();
+  const [selectedProblem, setSelectedProblem] = useState(null);
   const [loadingChoice, setLoadingChoice] = useState(false);
+  const { user } = useAuth();
 
   useEffect(() => {
     let mounted = true;
     async function loadChoice() {
-      if (!isWaiting || !round) { setLockedProblem(null); return; }
+      if (!round) { setSelectedProblem(null); return; }
       setLoadingChoice(true);
       try {
-        const { data: auth } = await supabase.auth.getUser();
-        const uid = auth?.user?.id;
-        if (!uid) { setLockedProblem(null); return; }
+        const uid = user?.$id;
+        if (!uid) { setSelectedProblem(null); return; }
         const choice = await getUserChoice(uid, Number(round));
-        if (mounted) setLockedProblem(choice?.problem ?? null);
+        console.log("Choice:", choice);
+        if (mounted) setSelectedProblem(choice?.problem ?? null);
       } catch (_) {
-        if (mounted) setLockedProblem(null);
+        if (mounted) setSelectedProblem(null);
       } finally {
         if (mounted) setLoadingChoice(false);
       }
     }
     loadChoice();
     return () => { mounted = false; };
-  }, [isWaiting, round]);
+  }, [round]);
 
   return (
     <ContestLayout>
-      {isWaiting && <ContestRulesModal />}
-      <div className="flex flex-col items-center justify-center min-h-[60vh] text-center">
-        <h1 className="text-3xl md:text-8xl font-extrabold text-[#00FFC6] mb-3 shadow-[0_0_10px_#00FFC6]/30">
-          MathX
+      <ContestRulesModal />
+      <div className="flex flex-col items-center justify-center h-[80vh] text-center">
+        <h1 className="text-3xl md:text-4xl font-extrabold text-[#00FFC6] mb-3">
+          🏁 MathX Contest Waiting Room
         </h1>
-        <h1 className="text-3xl md:text-4xl font-extrabold text-[#00FFC6] mb-3 shadow-[0_0_10px_#00FFC6]/30">
-          Clash to Code Waiting Room
-        </h1>
-        <p className="text-gray-300 max-w-lg">{message || "Awaiting next round..."}</p>
-        <p className="text-sm text-gray-500 mt-4">Stay focused — fullscreen mode is required!</p>
+        <p className="text-gray-300 mb-4">{message || "Awaiting next round…"}</p>
+
+        {selectedProblem && (
+          <div className="mt-6 p-5 bg-[#1E293B] border border-[#00FFC6]/30 rounded-lg w-[90%] md:w-[60%]">
+            <h3 className="text-[#00FFC6] font-semibold mb-2">Your Selected Problem</h3>
+            <p className="text-white font-bold">{selectedProblem.title}</p>
+            <p className="text-gray-300 text-sm">{selectedProblem.description}</p>
+          </div>
+        )}
       </div>
-      {isWaiting && (
-        <div className="mt-6">
-          {lockedProblem ? (
-            <div className="p-6 bg-[#1E293B] border border-[#00FFC6]/40 rounded-lg text-center">
-              <h2 className="text-[#00FFC6] font-bold text-xl mb-2">Your Selected Problem</h2>
-              <p className="text-white font-semibold">{lockedProblem.title}</p>
-              {lockedProblem.description && (
-                <p className="text-gray-300 text-sm mt-2">{lockedProblem.description}</p>
-              )}
-              <span className="block text-sm text-gray-400 mt-3">Waiting for next stage…</span>
-            </div>
-          ) : (
-            <p className="text-gray-400 text-sm text-center">
-              {loadingChoice ? "Checking your selection..." : "Problem will be assigned automatically."}
-            </p>
-          )}
-        </div>
-      )}
     </ContestLayout>
   );
 }

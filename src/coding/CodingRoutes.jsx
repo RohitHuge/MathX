@@ -1,26 +1,24 @@
  import { Routes, Route, Navigate } from "react-router-dom";
 import { ContestStageProvider } from "./context/ContestStageContext.jsx";
 
-import ContestLandingPage from "./pages/ContestLandingPage.jsx";
-import CodingEnvironmentPage from "./pages/CodingEnvironmentPage.jsx";
+import StageRouter from "./pages/StageRouter.jsx";
 import AdminDashboardPage from "./pages/AdminDashboardPage.jsx";
 
 export default function CodingModuleRoutes() {
   return (
     <ContestStageProvider>
       <Routes>
-        <Route index element={<Navigate to="waiting" replace />} />
-        {/* /coding/waiting → waiting page */}
-        <Route path="waiting" element={<ContestLandingPage />} />
+        {/* default redirect to centralized live router */}
+        <Route index element={<Navigate to="live" replace />} />
 
-        {/* /coding/editor → coding environment */}
-        <Route path="editor" element={<CodingEnvironmentPage />} />
+        {/* centralized stage-based router */}
+        <Route path="live" element={<StageRouter />} />
 
         {/* /coding/admin → admin dashboard */}
         <Route path="admin" element={<AdminDashboardPage />} />
 
-        {/* optional: fallback route */}
-        <Route path="*" element={<ContestLandingPage />} />
+        {/* fallback */}
+        <Route path="*" element={<Navigate to="live" replace />} />
       </Routes>
     </ContestStageProvider>
   );

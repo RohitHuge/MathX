@@ -57,24 +57,24 @@ export default function LeaderboardBar() {
     }
   };
 
-  useEffect(() => {
-    fetchLeaders();
-    const tick = () => {
-      if (document.visibilityState === "visible") fetchLeaders();
-    };
-    pollRef.current = setInterval(tick, 20000);
-    const onVis = () => {
-      if (document.visibilityState === "visible") fetchLeaders();
-    };
-    const onFocus = () => fetchLeaders();
-    document.addEventListener("visibilitychange", onVis);
-    window.addEventListener("focus", onFocus);
-    return () => {
-      clearInterval(pollRef.current);
-      document.removeEventListener("visibilitychange", onVis);
-      window.removeEventListener("focus", onFocus);
-    };
-  }, []);
+  // useEffect(() => {
+  //   // fetchLeaders();
+  //   const tick = () => {
+  //     if (document.visibilityState === "visible") fetchLeaders();
+  //   };
+  //   pollRef.current = setInterval(tick, 20000);
+  //   const onVis = () => {
+  //     if (document.visibilityState === "visible") fetchLeaders();
+  //   };
+  //   const onFocus = () => fetchLeaders();
+  //   document.addEventListener("visibilitychange", onVis);
+  //   window.addEventListener("focus", onFocus);
+  //   return () => {
+  //     clearInterval(pollRef.current);
+  //     document.removeEventListener("visibilitychange", onVis);
+  //     window.removeEventListener("focus", onFocus);
+  //   };
+  // }, []);
 
   return (
     <div className="fixed top-0 left-0 w-full backdrop-blur-sm text-white text-sm flex justify-between items-center px-4 py-2 z-50 shadow border-b border-[#A146D4]/30 bg-gradient-to-r from-[#A146D4]/10 to-[#49E3FF]/10">

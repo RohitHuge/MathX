@@ -38,10 +38,24 @@ function Toast({ text, onClose, duration = 2000 }) {
 }
 
 export default function AdminDashboardPage() {
-  const { stageCode, message, updateStage, loading } = useContestStageContext();
+  const { stageCode, message, roundStart, roundEnd, updateStage, loading } = useContestStageContext();
   const [selectedStage, setSelectedStage] = useState("A0");
   const [msg, setMsg] = useState("");
   const [toast, setToast] = useState(null);
+  const [startInput, setStartInput] = useState("");
+  const [endInput, setEndInput] = useState("");
+
+  const toLocalInput = (ts) => {
+    if (!ts) return "";
+    const d = new Date(ts);
+    const pad = (n) => String(n).padStart(2, "0");
+    const yyyy = d.getFullYear();
+    const mm = pad(d.getMonth() + 1);
+    const dd = pad(d.getDate());
+    const hh = pad(d.getHours());
+    const mi = pad(d.getMinutes());
+    return `${yyyy}-${mm}-${dd}T${hh}:${mi}`;
+  };
 
   useEffect(() => {
     if (stageCode) setSelectedStage(stageCode);
@@ -51,12 +65,23 @@ export default function AdminDashboardPage() {
     setMsg(message ?? "");
   }, [message]);
 
+  useEffect(() => {
+    setStartInput(toLocalInput(roundStart));
+  }, [roundStart]);
+
+  useEffect(() => {
+    setEndInput(toLocalInput(roundEnd));
+  }, [roundEnd]);
+
   const canSubmit = useMemo(() => !!selectedStage, [selectedStage]);
 
   const handleUpdate = async () => {
     if (!canSubmit) return;
     try {
-      await updateStage({ stage_code: selectedStage, message: msg });
+      const payload = { stage_code: selectedStage, message: msg };
+      if (startInput) payload.roundStart = new Date(startInput).toISOString();
+      if (endInput) payload.roundEnd = new Date(endInput).toISOString();
+      await updateStage(payload);
       console.log("Stage updated to", selectedStage);
       setToast(`Stage updated to ${selectedStage} successfully`);
     } catch (e) {
@@ -118,6 +143,37 @@ export default function AdminDashboardPage() {
             }}
           />
         </label>
+
+        <div style={{ display: "grid", gap: 12, gridTemplateColumns: "1fr 1fr" }}>
+          <label style={{ display: "grid", gap: 6 }}>
+            <span style={{ fontSize: 12, color: "#374151" }}>Round Start (local)</span>
+            <input
+              type="datetime-local"
+              value={startInput}
+              onChange={(e) => setStartInput(e.target.value)}
+              style={{
+                padding: "10px 12px",
+                borderRadius: 8,
+                border: "1px solid #d1d5db",
+                background: "white",
+              }}
+            />
+          </label>
+          <label style={{ display: "grid", gap: 6 }}>
+            <span style={{ fontSize: 12, color: "#374151" }}>Round End (local)</span>
+            <input
+              type="datetime-local"
+              value={endInput}
+              onChange={(e) => setEndInput(e.target.value)}
+              style={{
+                padding: "10px 12px",
+                borderRadius: 8,
+                border: "1px solid #d1d5db",
+                background: "white",
+              }}
+            />
+          </label>
+        </div>
 
         <button
           disabled={!canSubmit || loading}

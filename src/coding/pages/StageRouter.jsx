@@ -4,7 +4,7 @@ import { useContestStageContext } from "../context/ContestStageContext";
 import ContestLandingPage from "./ContestLandingPage";
 import ProblemSelectionPage from "./ProblemSelectionPage";
 import CodingEnvironmentPage from "./CodingEnvironmentPage";
-import LeaderboardPage from "./LeaderboardPage";
+import ResultsPage from "./ResultsPage";
 
 export default function StageRouter() {
   const { stageCode, loading } = useContestStageContext();
@@ -20,7 +20,7 @@ export default function StageRouter() {
       case "C":
         return <CodingEnvironmentPage />;
       case "D":
-        return <LeaderboardPage />;
+        return <ResultsPage />;
       default:
         return (
           <div className="flex items-center justify-center h-screen text-gray-400 bg-[#0B1120]">

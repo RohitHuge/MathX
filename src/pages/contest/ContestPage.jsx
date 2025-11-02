@@ -579,6 +579,18 @@ const ContestPage = () => {
 
   // Handle accepting contest instructions and requesting fullscreen
   const handleAcceptInstructions = async () => {
+
+    const existing = await getUserContestScore(contestId, user.$id);
+    if (existing) {
+      if (existing.end_time) {
+        showToast('You have already completed this contest!', 'error');
+        return;
+      } else {
+        showToast('You have already started this contest.', 'warning');
+        return;
+      }
+    }
+
     try {
       if (!user) {
         showToast('Please login to start the contest', 'error');

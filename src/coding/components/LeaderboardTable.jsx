@@ -15,13 +15,17 @@ export default function LeaderboardTable({ data = [], variant = "overall", highl
               <th className="px-3 py-2">Rank</th>
               <th className="px-3 py-2">Name</th>
               {variant === "overall" ? (
-                <th className="px-3 py-2">Total Time (s)</th>
-              ) : (
-                <>
-                  <th className="px-3 py-2">Problem</th>
-                  <th className="px-3 py-2">Problem Rank</th>
-                </>
-              )}
+  <>
+    <th className="px-3 py-2">Score</th>
+    <th className="px-3 py-2">Total Time (s)</th>
+  </>
+) : (
+  <>
+    <th className="px-3 py-2">Problem</th>
+    <th className="px-3 py-2">Score</th>
+  </>
+)}
+
             </tr>
           </thead>
           <tbody>
@@ -35,13 +39,17 @@ export default function LeaderboardTable({ data = [], variant = "overall", highl
                   <td className="px-3 py-2 text-gray-200">{row.rank ?? row.round_rank ?? idx + 1}</td>
                   <td className="px-3 py-2 text-white">{row.name}</td>
                   {variant === "overall" ? (
-                    <td className="px-3 py-2 text-gray-200">{row.total_time}</td>
-                  ) : (
-                    <>
-                      <td className="px-3 py-2 text-gray-200">{row.problem}</td>
-                      <td className="px-3 py-2 text-gray-200">{row.problem_rank}</td>
-                    </>
-                  )}
+  <>
+    <td className="px-3 py-2 text-[#00FFC6] font-semibold">{row.total_score ?? 0}</td>
+    <td className="px-3 py-2 text-gray-200">{row.total_time}</td>
+  </>
+) : (
+  <>
+    <td className="px-3 py-2 text-gray-200">{row.problem}</td>
+    <td className="px-3 py-2 text-[#00FFC6] font-semibold">{row.score ?? 0}</td>
+  </>
+)}
+
                 </tr>
               );
             })}

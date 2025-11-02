@@ -21,9 +21,10 @@ export default function UserStatsCard({ stats }) {
           <div className="text-white font-semibold">{s.roundRank ?? "-"}</div>
         </div>
         <div className="bg-black/20 rounded p-3">
-          <div className="text-gray-400">📘 Problem Rank</div>
-          <div className="text-white font-semibold">{s.problemRank ?? "-"}</div>
-        </div>
+        <div className="text-gray-400">💯 Score</div>
+        <div className="text-[#00FFC6] font-semibold">{s.score ?? "0"}</div>
+      </div>
+
         <div className="bg-black/20 rounded p-3 col-span-2">
           <div className="text-gray-400">⏱ Time Taken (s)</div>
           <div className="text-white font-semibold">{s.timeTaken ?? "-"}</div>

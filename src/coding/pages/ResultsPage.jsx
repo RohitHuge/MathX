@@ -10,7 +10,9 @@ export default function ResultsPage() {
   const { stageCode, round, message } = useContestStageContext();
   const { user } = useAuth();
   const userId = user?.$id;
-  const { leaderboardData, userStats, refetch, loading, isOverall } = useLeaderboard(stageCode, userId);
+  const { leaderboardData, userStats, refetch, loading } = useLeaderboard(stageCode, userId);
+
+  const isOverall = stageCode === "D0";
 
   const title = useMemo(() => {
     if (isOverall) return "🏆 Overall Leaderboard";

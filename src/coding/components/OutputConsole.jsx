@@ -1,24 +1,40 @@
-import React from "react";
+ import React, { useEffect, useRef } from "react";
 
-export default function OutputConsole({ result }) {
-  const stdout = result?.stdout ?? "";
-  const stderr = result?.stderr ?? result?.compile_output ?? "";
-  const status = result?.status?.description ?? "";
+ export default function OutputConsole({ loading, output = "", error = "", verdict = null }) {
+   const ref = useRef(null);
 
-  return (
-    <div className="mt-4 grid gap-3">
-      <div>
-        <div className="text-sm font-medium text-gray-600 mb-1">stdout</div>
-        <pre className="bg-gray-900 text-gray-100 p-3 rounded-md overflow-auto max-h-60 whitespace-pre-wrap">{stdout || ""}</pre>
-      </div>
-      <div>
-        <div className="text-sm font-medium text-gray-600 mb-1">stderr</div>
-        <pre className="bg-gray-900 text-red-300 p-3 rounded-md overflow-auto max-h-60 whitespace-pre-wrap">{stderr || ""}</pre>
-      </div>
-      <div>
-        <div className="text-sm font-medium text-gray-600 mb-1">status</div>
-        <div className="bg-gray-100 p-2 rounded-md text-gray-800">{status || ""}</div>
-      </div>
-    </div>
-  );
-}
+   useEffect(() => {
+     if (ref.current) {
+       ref.current.scrollTop = ref.current.scrollHeight;
+     }
+   }, [output, error, verdict, loading]);
+
+   return (
+     <div className="bg-[#1E293B] border border-[#00FFC6]/20 rounded-lg overflow-hidden">
+       <div className="px-4 py-2 border-b border-[#00FFC6]/20 flex items-center justify-between">
+         <span className="text-sm text-[#00FFC6] font-semibold">Output</span>
+         {verdict && (
+           <span className={`text-sm font-bold ${
+             verdict === 1 ? "text-emerald-400" : "text-red-400"
+           }`}>
+             {verdict === 1 ? "✅ Accepted" : "❌ Wrong Answer"}
+           </span>
+         )}
+       </div>
+       <div ref={ref} className="p-4 max-h-56 overflow-auto text-sm text-gray-200 font-mono">
+         {loading && (
+           <div className="flex items-center gap-2 text-gray-300">
+             <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-[#00FFC6]"></div>
+             Running code…
+           </div>
+         )}
+         {!loading && error && (
+           <pre className="text-red-300 whitespace-pre-wrap">{error}</pre>
+         )}
+         {!loading && !error && (
+           <pre className="whitespace-pre-wrap">{output || ""}</pre>
+         )}
+       </div>
+     </div>
+   );
+ }

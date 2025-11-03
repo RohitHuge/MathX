@@ -1,14 +1,20 @@
-import React from "react";
+ import React, { useContext } from "react";
+ import { FullscreenContext } from "../context/FullscreenContext";
 
-export default function RunButton({ onClick, loading }) {
-  return (
-    <button
-      type="button"
-      onClick={onClick}
-      disabled={loading}
-      className="px-4 py-2 rounded-md bg-blue-600 text-white hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
-    >
-      {loading ? "Running…" : "Run Code"}
-    </button>
-  );
-}
+ export default function RunButton({ onRun = () => {} }) {
+   const { isFullscreenActive } = useContext(FullscreenContext);
+
+   return (
+     <button
+       onClick={() => isFullscreenActive && onRun()}
+       disabled={!isFullscreenActive}
+       className={`px-4 py-2 rounded font-semibold transition ${
+         isFullscreenActive
+           ? "bg-[#00FFC6] text-black hover:bg-[#00e0b0]"
+           : "opacity-50 cursor-not-allowed bg-gray-600 text-white"
+       }`}
+     >
+       ▶ Run
+     </button>
+   );
+ }

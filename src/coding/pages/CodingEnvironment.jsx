@@ -2,7 +2,7 @@ import React, { useCallback, useState } from "react";
 import CodeEditor from "../components/CodeEditor";
 import RunButton from "../components/RunButton";
 import OutputConsole from "../components/OutputConsole";
-import { runCCode } from "../utils/judge0Client";
+// import { runCCode } from "../utils/judge0Client";
 
 const DEFAULT_C_CODE = "#include <stdio.h>\nint main(){\n    printf(\"Hello\\n\");\n    return 0;\n}";
 

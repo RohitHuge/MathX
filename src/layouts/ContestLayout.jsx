@@ -15,10 +15,12 @@ import {
   BarChart3,
   Menu,
   X,
-  Shield
+  Shield,
+  Code
 } from 'lucide-react';
 import ContestModal from '../components/navigation/ContestModal';
 import { isUserAdmin } from '../utils/adminUtils';
+import { isUserAllowedForCoding } from '../coding/CodingProtectedRoute';
 
 const ContestLayout = ({ children }) => {
   const [showProfileDropdown, setShowProfileDropdown] = useState(false);
@@ -87,6 +89,7 @@ const ContestLayout = ({ children }) => {
 
   // Check if user has admin privileges
   const isAdmin = isUserAdmin(user);
+  const isCodingAllowed = isUserAllowedForCoding(user);
 
   const navItems = [
     {
@@ -124,7 +127,18 @@ const ContestLayout = ({ children }) => {
       icon: Shield,
       path: '/admin',
       action: () => navigate('/admin')
+    }] : []),
+
+    // Only show coding option for users with coding privileges
+    ...(isCodingAllowed ? [{
+      id: 'coding',
+      label: 'Coding',
+      icon: Code,
+      path: '/coding',
+      action: () => navigate('/coding')
     }] : [])
+
+
     // {
     //   id: 'attempt',
     //   label: 'Attempt Contest',

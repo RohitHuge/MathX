@@ -82,11 +82,24 @@ export default function useJudge0() {
       const combinedError = compileErr || runtimeErr || "";
       const status = data?.status?.description ?? "Unknown";
 
-      // Compare output to expected (trim both sides)
-      let verdict = 0;
-      if (source.expectedOutput) {
-        verdict = output?.trim() === source.expectedOutput?.trim() ? 1 : 0;
-      }
+      // 🧩 Normalize both expected and actual outputs for fair comparison
+function normalizeOutput(s = "") {
+  return s
+    .replace(/\r\n/g, "\n")        // normalize newlines
+    .replace(/[ \t]+$/gm, "")      // remove trailing spaces per line
+    .trim();                       // remove extra blank lines
+}
+
+let verdict = 0;
+if (source.expectedOutput) {
+  const expected = normalizeOutput(source.expectedOutput);
+  const actual = normalizeOutput(output);
+
+  // Debug (optional): console.log("EXPECTED:", JSON.stringify(expected), "ACTUAL:", JSON.stringify(actual));
+
+  verdict = expected === actual ? 1 : 0;
+}
+
 
       const finalResult = {
         output: output || "(no output)",

@@ -11,6 +11,7 @@ export default function useJudge0() {
     setError(null);
 
     try {
+      // 🧱 Step 1: Fetch active Judge0 config
       const { data: cfg, error: cfgErr } = await supabase
         .from("judge0_config")
         .select("config")
@@ -19,7 +20,7 @@ export default function useJudge0() {
         .single();
 
       if (cfgErr || !cfg?.config) {
-        throw new Error("⚠️ No active Judge0 configuration found in the database");
+        throw new Error("⚠️ No active Judge0 configuration found in DB");
       }
 
       const config = cfg.config;
@@ -27,12 +28,16 @@ export default function useJudge0() {
       const headers = config.headers || {};
       const bodyTemplate = config.bodyTemplate || {};
 
-      // 🧩 Step 2: Safely clone bodyTemplate and inject runtime values
-const body = structuredClone(bodyTemplate); // modern safe deep copy
-body.source_code = source;
-body.stdin = stdin ?? "";
+      // 🧩 Step 2: Encode input for base64 endpoints
+      const toBase64 = (str) => btoa(unescape(encodeURIComponent(str)));
 
+      const body = structuredClone(bodyTemplate);
+      body.source_code = toBase64(source);
+      body.stdin = toBase64(stdin ?? "");
 
+      console.log("📦 Final Body Sent:", body);
+
+      // 🧩 Step 3: Make API call
       const res = await fetch(url, {
         method: "POST",
         headers,
@@ -43,12 +48,25 @@ body.stdin = stdin ?? "";
 
       const data = await res.json();
 
-      const output = data?.stdout ?? "";
-      const compile_output = data?.compile_output ?? "";
-      const runtime_output = data?.stderr ?? "";
+      // 🧠 Step 4: Decode base64 outputs from VPS
+      const fromBase64 = (text) => {
+        if (!text) return "";
+        try {
+          return decodeURIComponent(
+            escape(atob(text.replace(/\s/g, "")))
+          );
+        } catch {
+          return text; // fallback if not base64
+        }
+      };
+
+      const output = fromBase64(data?.stdout) ?? "";
+      const compile_output = fromBase64(data?.compile_output) ?? "";
+      const runtime_output = fromBase64(data?.stderr) ?? "";
       const combinedError = compile_output || runtime_output || "";
       const status = data?.status?.description ?? "Unknown";
 
+      // 🧩 Step 5: Normalize & compare
       function normalizeOutput(s = "") {
         return s.replace(/\r\n/g, "\n").replace(/[ \t]+$/gm, "").trim();
       }

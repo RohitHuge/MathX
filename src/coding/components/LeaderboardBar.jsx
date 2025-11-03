@@ -77,16 +77,18 @@ export default function LeaderboardBar() {
   // }, []);
 
   return (
-    <div className="fixed top-0 left-0 w-full backdrop-blur-sm text-white text-sm flex justify-between items-center px-4 py-2 z-50 shadow border-b border-[#A146D4]/30 bg-gradient-to-r from-[#A146D4]/10 to-[#49E3FF]/10">
-      <div className="flex gap-4 overflow-x-auto">
+    <div className="fixed top-0 left-0 w-full backdrop-blur-sm text-white text-lg flex justify-between items-center px-4 py-2 z-50 shadow border-b border-[#A146D4]/30 bg-gradient-to-r from-[#A146D4]/10 to-[#49E3FF]/10">
+      <h1>MATHX PRESENTS's CLASH OF CODERS</h1>
+      
+      {/* <div className="flex gap-4 overflow-x-auto">
         {leaders.map((u, i) => (
           <div key={u.user_id ?? i} className="flex items-center gap-1">
             <span className="text-[#49E3FF] font-semibold">#{i + 1}</span>
             <span className="truncate max-w-[140px] text-white">{u.name ?? "Anon"}</span>
           </div>
         ))}
-      </div>
-      <div className="text-[#49E3FF] font-semibold">You: {userRank ? `#${userRank}` : "N/A"}</div>
+      </div> */}
+      {/* <div className="text-[#49E3FF] font-semibold">You: {userRank ? `#${userRank}` : "N/A"}</div> */}
     </div>
   );
 }

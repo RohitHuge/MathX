@@ -175,7 +175,8 @@ export const useLeaderboard = () => {
   }, []);
 
   const getTopPlayers = (count = 8) => {
-    return leaderboard.slice(0, count);
+    // return leaderboard.slice(0, count); 
+    return // change this to leaderboard.slice(0, count) when leaderboard is ready
   };
 
   const getUserRank = (userId) => {

@@ -16,6 +16,10 @@ const STAGE_OPTIONS = [
   "C3",
   "D3",
   "D0",
+  "A4",
+  "B4",
+  "C4",
+  "D4",
 ];
 
 function Toast({ text, onClose, duration = 2000 }) {

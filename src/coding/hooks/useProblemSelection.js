@@ -26,7 +26,8 @@ export default function useProblemSelection(round) {
         const userId = user?.$id;
         if (userId) {
           const choice = await getUserChoice(userId, roundNo);
-          if (choice?.problem) {
+          console.log("User choice:", choice);
+          if (choice?.problem && choice?.choice?.problem_id != null ) {
             if (active) {
               setSelectedProblem(choice.problem);
               setLocked(true);

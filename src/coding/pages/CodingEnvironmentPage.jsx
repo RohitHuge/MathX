@@ -18,7 +18,7 @@ export default function CodingEnvironmentPage() {
   const [code, setCode] = useState(`#include <stdio.h>\n\nint main() {\n    // Your code here\n    return 0;\n}\n`);
   const [customInput, setCustomInput] = useState("");
   const [submissions, setSubmissions] = useState([]);
-  const { loading: running, result, run } = useJudge0();
+  const { loading: running, error, result, runCCode } = useJudge0();
   const expectedOutput = useMemo(() => problem?.sample_output ?? "", [problem]);
   const [showCodingEnvironment, setShowCodingEnvironment] = useState(true);
 
@@ -62,12 +62,7 @@ export default function CodingEnvironmentPage() {
   }, [userId, round]);
 
   const handleRun = async () => {
-    await run({
-      source: code,
-      stdin: customInput ?? problem?.sample_input ?? "",
-      languageId: 50,
-      expectedOutput,
-    });
+    await runCCode(code, customInput ?? problem?.sample_input ?? "", expectedOutput);
   };
 
   const handleSubmit = async () => {

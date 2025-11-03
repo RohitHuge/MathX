@@ -1,107 +1,66 @@
 import { useState } from "react";
-
-/**
- * Hook: useJudge0
- * ---------------------------------------------------
- * Executes C code on Judge0 and verifies output.
- * - Uses synchronous `wait=true` mode (no polling)
- * - Compares stdout vs expected output
- * - Displays compiler/runtime/API errors in console output
- * ---------------------------------------------------
- */
+import { supabase } from "../../config/supabaseClient.js";
 
 export default function useJudge0() {
   const [loading, setLoading] = useState(false);
-  const [result, setResult] = useState(null);
   const [error, setError] = useState(null);
+  const [result, setResult] = useState(null);
 
-  async function run(source) {
+  async function runCCode(source, stdin = "", expectedOutput = "") {
     setLoading(true);
     setError(null);
-    setResult(null);
-
-    const baseUrl = "https://ce.judge0.com/submissions?base64_encoded=false&wait=true";
 
     try {
-      const headers = {
-        "Content-Type": "application/json",
-        Accept: "application/json",
-      };
+      const { data: cfg, error: cfgErr } = await supabase
+        .from("judge0_config")
+        .select("config")
+        .eq("is_active", true)
+        .limit(1)
+        .single();
 
-      if (import.meta.env.VITE_JUDGE0_KEY) {
-        headers["X-RapidAPI-Key"] = import.meta.env.VITE_JUDGE0_KEY;
-        headers["X-RapidAPI-Host"] = "judge0-ce.p.rapidapi.com";
+      if (cfgErr || !cfg?.config) {
+        throw new Error("⚠️ No active Judge0 configuration found in the database");
       }
 
-      // build request body
-      const body = {
-        language_id: 50,
-        source_code: source.source,
-        stdin: source.stdin || "",
-        compiler_options: "-lm",
-      };
+      const config = cfg.config;
+      const url = config.url;
+      const headers = config.headers || {};
+      const bodyTemplate = config.bodyTemplate || {};
 
-      const res = await fetch(baseUrl, {
+      // 🧩 Step 2: Safely clone bodyTemplate and inject runtime values
+const body = structuredClone(bodyTemplate); // modern safe deep copy
+body.source_code = source;
+body.stdin = stdin ?? "";
+
+
+      const res = await fetch(url, {
         method: "POST",
         headers,
         body: JSON.stringify(body),
       });
 
-      const text = await res.text();
-      let data = {};
-      try {
-        data = text ? JSON.parse(text) : {};
-      } catch (e) {
-        throw new Error("Failed to parse Judge0 response");
-      }
+      if (!res.ok) throw new Error(`Judge0 API call failed (${res.status})`);
 
-      // handle bad response explicitly
-      if (!res.ok) {
-        const apiError =
-          data?.message ||
-          data?.error ||
-          data?.detail ||
-          "Judge0 request failed (invalid code or parameters).";
-
-        const finalResult = {
-          output: "",
-          error: apiError,
-          verdict: 0,
-          status: "Bad Request",
-          raw: data,
-        };
-
-        setResult(finalResult);
-        setError(apiError);
-        return finalResult;
-      }
+      const data = await res.json();
 
       const output = data?.stdout ?? "";
-      const compileErr = data?.compile_output ?? "";
-      const runtimeErr = data?.stderr ?? "";
-      const combinedError = compileErr || runtimeErr || "";
+      const compile_output = data?.compile_output ?? "";
+      const runtime_output = data?.stderr ?? "";
+      const combinedError = compile_output || runtime_output || "";
       const status = data?.status?.description ?? "Unknown";
 
-      // 🧩 Normalize both expected and actual outputs for fair comparison
-function normalizeOutput(s = "") {
-  return s
-    .replace(/\r\n/g, "\n")        // normalize newlines
-    .replace(/[ \t]+$/gm, "")      // remove trailing spaces per line
-    .trim();                       // remove extra blank lines
-}
+      function normalizeOutput(s = "") {
+        return s.replace(/\r\n/g, "\n").replace(/[ \t]+$/gm, "").trim();
+      }
 
-let verdict = 0;
-if (source.expectedOutput) {
-  const expected = normalizeOutput(source.expectedOutput);
-  const actual = normalizeOutput(output);
+      let verdict = 0;
+      if (expectedOutput) {
+        const expected = normalizeOutput(expectedOutput);
+        const actual = normalizeOutput(output);
+        verdict = expected === actual ? 1 : 0;
+      }
 
-  // Debug (optional): console.log("EXPECTED:", JSON.stringify(expected), "ACTUAL:", JSON.stringify(actual));
-
-  verdict = expected === actual ? 1 : 0;
-}
-
-
-      const finalResult = {
+      const resultData = {
         output: output || "(no output)",
         error: combinedError,
         verdict,
@@ -109,28 +68,24 @@ if (source.expectedOutput) {
         raw: data,
       };
 
-      setResult(finalResult);
-      return finalResult;
+      setResult(resultData);
+      return resultData;
     } catch (err) {
-      console.error("Judge0 Error:", err);
-
-      // expose network / unexpected errors to UI
-      const userError = err?.message || "Execution failed (network or API error)";
-      const failResult = {
+      console.error("⚠️ useJudge0 Error:", err);
+      setError(err.message || "Unexpected Judge0 error");
+      const fallback = {
         output: "",
-        error: userError,
+        error: err.message,
         verdict: 0,
         status: "Error",
-        raw: {},
+        raw: null,
       };
-
-      setError(userError);
-      setResult(failResult);
-      return failResult;
+      setResult(fallback);
+      return fallback;
     } finally {
       setLoading(false);
     }
   }
 
-  return { run, loading, result, error };
+  return { runCCode, loading, error, result };
 }

@@ -256,7 +256,12 @@ export default function GuestContestPage() {
                     total_questions: questions.length,
                     answers: currentInfo.answers,
                     cheating_flags: currentInfo.flags,
-                    submitted_at: new Date().toISOString()
+                    submitted_at: new Date().toISOString(),
+                    additional_details: {
+                        div: guestDetails.div,
+                        roll: guestDetails.roll,
+                        prn: guestDetails.prn
+                    }
                 });
 
             if (sbError) throw sbError;

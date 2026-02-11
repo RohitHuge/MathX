@@ -178,6 +178,52 @@ export default function GuestStartPage() {
                             {validationErrors.email && <p className="text-red-500 text-xs mt-1">{validationErrors.email}</p>}
                         </div>
 
+                        <div className="grid grid-cols-2 gap-4">
+                            <div>
+                                <label className="block text-sm font-medium text-[#94A3B8] mb-1">Div *</label>
+                                <input
+                                    type="text"
+                                    className={`w-full bg-[#0F172A] border rounded-lg py-2.5 px-4 text-white focus:outline-none focus:border-[#49E3FF] transition-colors ${validationErrors.div ? 'border-red-500' : 'border-[#334155]'}`}
+                                    placeholder="A"
+                                    value={formData.div}
+                                    onChange={e => {
+                                        setFormData({ ...formData, div: e.target.value });
+                                        if (validationErrors.div) setValidationErrors({ ...validationErrors, div: null });
+                                    }}
+                                />
+                                {validationErrors.div && <p className="text-red-500 text-xs mt-1">{validationErrors.div}</p>}
+                            </div>
+                            <div>
+                                <label className="block text-sm font-medium text-[#94A3B8] mb-1">Roll No *</label>
+                                <input
+                                    type="text"
+                                    className={`w-full bg-[#0F172A] border rounded-lg py-2.5 px-4 text-white focus:outline-none focus:border-[#49E3FF] transition-colors ${validationErrors.roll ? 'border-red-500' : 'border-[#334155]'}`}
+                                    placeholder="101"
+                                    value={formData.roll}
+                                    onChange={e => {
+                                        setFormData({ ...formData, roll: e.target.value });
+                                        if (validationErrors.roll) setValidationErrors({ ...validationErrors, roll: null });
+                                    }}
+                                />
+                                {validationErrors.roll && <p className="text-red-500 text-xs mt-1">{validationErrors.roll}</p>}
+                            </div>
+                        </div>
+
+                        <div>
+                            <label className="block text-sm font-medium text-[#94A3B8] mb-1">PRN *</label>
+                            <input
+                                type="text"
+                                className={`w-full bg-[#0F172A] border rounded-lg py-2.5 px-4 text-white focus:outline-none focus:border-[#49E3FF] transition-colors ${validationErrors.prn ? 'border-red-500' : 'border-[#334155]'}`}
+                                placeholder="Permanent Registration Number"
+                                value={formData.prn}
+                                onChange={e => {
+                                    setFormData({ ...formData, prn: e.target.value });
+                                    if (validationErrors.prn) setValidationErrors({ ...validationErrors, prn: null });
+                                }}
+                            />
+                            {validationErrors.prn && <p className="text-red-500 text-xs mt-1">{validationErrors.prn}</p>}
+                        </div>
+
                         <div>
                             <label className="block text-sm font-medium text-[#94A3B8] mb-1">Phone Number (Optional)</label>
                             <div className="relative">

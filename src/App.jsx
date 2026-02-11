@@ -15,6 +15,8 @@ import ContestLayout from './layouts/ContestLayout'
 import ContestManagement from './pages/admin/ContestManagement'
 import AdminRoute from './components/admin/AdminRoute'
 import CodingModuleRoutes from './coding/CodingRoutes'
+import GuestStartPage from './pages/contest/GuestStartPage'
+import GuestContestPage from './pages/contest/GuestContestPage'
 
 function App() {
   return (
@@ -28,24 +30,26 @@ function App() {
           <Route path='/contact' element={<Contact />} />
           <Route path='/links' element={<LinksPage />} />
           <Route path='/registration' element={<RegistrationPage />} />
-          
+
           {/* Contest Platform Routes with Layout */}
           <Route path='/contest' element={
             <ContestLayout>
               <ContestLandingPage />
             </ContestLayout>
           } />
-              <Route path='/contests' element={
-                <ContestLayout>
-                  <ContestListPage />
-                </ContestLayout>
-              } />
-              <Route path='/contest/:contestId' element={<ContestPage />} />
-              <Route path='/dashboard' element={
-                <ContestLayout>
-                  <Dashboard />
-                </ContestLayout>
-              } />
+          <Route path='/contests' element={
+            <ContestLayout>
+              <ContestListPage />
+            </ContestLayout>
+          } />
+          <Route path='/contest/:contestId' element={<ContestPage />} />
+          <Route path='/contest/guest/:contestId' element={<GuestStartPage />} />
+          <Route path='/contest/guest/:contestId/attempt' element={<GuestContestPage />} />
+          <Route path='/dashboard' element={
+            <ContestLayout>
+              <Dashboard />
+            </ContestLayout>
+          } />
           <Route path='/admin' element={
             <ContestLayout>
               <AdminRoute>
@@ -56,7 +60,7 @@ function App() {
           <Route path='/coding/*' element={<CodingModuleRoutes />} />
 
 
-        </Routes> 
+        </Routes>
       </BrowserRouter>
     </AuthProvider>
   )

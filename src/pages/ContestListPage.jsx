@@ -3,13 +3,13 @@ import { motion, AnimatePresence } from 'motion/react';
 import { useAuth } from '../contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import { Client, Databases, Query } from 'appwrite';
-import { 
-  Trophy, 
-  Clock, 
-  Users, 
-  Calendar, 
-  Play, 
-  Eye, 
+import {
+  Trophy,
+  Clock,
+  Users,
+  Calendar,
+  Play,
+  Eye,
   ChevronRight,
   Filter,
   Search,
@@ -20,13 +20,13 @@ import {
   RefreshCw
 } from 'lucide-react';
 import { appwriteEndpoint, appwriteProjectId, appwriteDatabaseId } from '../../config.js';
-import { 
-  classifyContest, 
-  formatDateTime, 
-  getDifficultyStyling, 
-  getStatusBadge, 
-  sortContests, 
-  filterContests 
+import {
+  classifyContest,
+  formatDateTime,
+  getDifficultyStyling,
+  getStatusBadge,
+  sortContests,
+  filterContests
 } from '../utils/contestUtils';
 
 // Appwrite configuration
@@ -39,7 +39,7 @@ const databases = new Databases(client);
 const ContestListPage = () => {
   const { user, isAuthenticated } = useAuth();
   const navigate = useNavigate();
-  
+
   // State management
   const [contests, setContests] = useState([]);
   const [filteredContests, setFilteredContests] = useState([]);
@@ -62,7 +62,7 @@ const ContestListPage = () => {
       // console.log(`user label: ${user.labels[0]}`);
 
       // Fetch contests from Appwrite database
-      if (user.labels[0] == 'mvp' || user.labels[0] === 'admin') {
+      if (user && user.labels && (user.labels[0] == 'mvp' || user.labels[0] === 'admin')) {
         response = await databases.listDocuments(
           appwriteDatabaseId, // Replace with your database ID
           'contest_info', // Replace with your collection ID
@@ -72,9 +72,9 @@ const ContestListPage = () => {
             Query.orderDesc('$createdAt')
           ]
         );
-       
+
       } else {
-         response = await databases.listDocuments(
+        response = await databases.listDocuments(
           appwriteDatabaseId, // Replace with your database ID
           'contest_info', // Replace with your collection ID
           [
@@ -84,7 +84,7 @@ const ContestListPage = () => {
             Query.orderDesc('$createdAt')
           ]
         );
-        
+
       }
 
       // Process and classify contests
@@ -118,7 +118,7 @@ const ContestListPage = () => {
 
     // Apply search filter
     filtered = filterContests(filtered, searchQuery);
-    
+
     // Sort contests
     filtered = sortContests(filtered, sortBy);
 
@@ -129,7 +129,7 @@ const ContestListPage = () => {
   const getStatusBadgeComponent = (contest) => {
     const classification = contest.classification;
     const badge = getStatusBadge(classification);
-    
+
     return (
       <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${badge.bg} ${badge.text} border ${badge.border}`}>
         {classification === 'ongoing' ? (
@@ -146,6 +146,12 @@ const ContestListPage = () => {
 
   // Handle contest action
   const handleContestAction = (contest) => {
+    // Check for guest access first
+    if (contest.auth_required === false) {
+      navigate(`/contest/guest/${contest.$id}`);
+      return;
+    }
+
     if (contest.classification === 'ongoing' || contest.classification === 'upcoming') {
       navigate(`/contest/${contest.$id}`);
     } else {
@@ -188,11 +194,11 @@ const ContestListPage = () => {
         No {type} contests found
       </h3>
       <p className="text-[#AEAEAE] mb-6">
-        {type === 'ongoing' 
+        {type === 'ongoing'
           ? "There are no contests running at the moment. Check back later!"
           : type === 'upcoming'
-          ? "No upcoming contests scheduled. Stay tuned for new challenges!"
-          : "No past contests available to view."
+            ? "No upcoming contests scheduled. Stay tuned for new challenges!"
+            : "No past contests available to view."
         }
       </p>
       {type === 'upcoming' && (
@@ -274,21 +280,19 @@ const ContestListPage = () => {
                 <motion.button
                   key={tab.id}
                   onClick={() => setActiveTab(tab.id)}
-                  className={`flex items-center space-x-2 px-4 py-2 rounded-lg font-medium transition-all duration-200 ${
-                    activeTab === tab.id
-                      ? 'bg-gradient-to-r from-[#A146D4] to-[#49E3FF] text-white'
-                      : 'bg-white/5 text-[#AEAEAE] hover:bg-white/10 hover:text-white'
-                  }`}
+                  className={`flex items-center space-x-2 px-4 py-2 rounded-lg font-medium transition-all duration-200 ${activeTab === tab.id
+                    ? 'bg-gradient-to-r from-[#A146D4] to-[#49E3FF] text-white'
+                    : 'bg-white/5 text-[#AEAEAE] hover:bg-white/10 hover:text-white'
+                    }`}
                   whileHover={{ scale: 1.02 }}
                   whileTap={{ scale: 0.98 }}
                 >
                   <Icon className="w-4 h-4" />
                   <span>{tab.label}</span>
-                  <span className={`px-2 py-0.5 rounded-full text-xs ${
-                    activeTab === tab.id 
-                      ? 'bg-white/20' 
-                      : 'bg-white/10'
-                  }`}>
+                  <span className={`px-2 py-0.5 rounded-full text-xs ${activeTab === tab.id
+                    ? 'bg-white/20'
+                    : 'bg-white/10'
+                    }`}>
                     {tab.count}
                   </span>
                 </motion.button>
@@ -342,7 +346,7 @@ const ContestListPage = () => {
               >
                 {filteredContests.map((contest, index) => {
                   const { date, time } = formatDateTime(contest.startTime);
-                  
+
                   return (
                     <motion.div
                       key={contest.$id}

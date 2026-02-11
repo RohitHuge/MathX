@@ -12,13 +12,13 @@ const client = new Client()
 
 const databases = new Databases(client);
 
-const CombinedHero = ({ 
-  leaderboard, 
-  isLoggedIn, 
-  onRegister, 
-  onLogin, 
+const CombinedHero = ({
+  leaderboard,
+  isLoggedIn,
+  onRegister,
+  onLogin,
   onViewContests,
-  onViewFullLeaderboard 
+  onViewFullLeaderboard
 }) => {
   const navigate = useNavigate();
   const [contest, setContest] = useState(null);
@@ -37,7 +37,7 @@ const CombinedHero = ({
     const fetchFeaturedContest = async () => {
       try {
         setLoading(true);
-        
+
         // Fetch contest with showInLanding: true
         const response = await databases.listDocuments(
           appwriteDatabaseId,
@@ -62,7 +62,8 @@ const CombinedHero = ({
             question_count: featuredContest.questionCount,
             status: featuredContest.status,
             difficulty: featuredContest.difficulty,
-            price: featuredContest.price
+            price: featuredContest.price,
+            auth_required: featuredContest.auth_required // Map this field
           });
         } else {
           setContest(null);
@@ -79,7 +80,7 @@ const CombinedHero = ({
 
     // Refresh featured contest every 30 seconds
     const refreshInterval = setInterval(fetchFeaturedContest, 30000);
-    
+
     return () => clearInterval(refreshInterval);
   }, []);
 
@@ -138,6 +139,10 @@ const CombinedHero = ({
 
   const handleButtonClick = () => {
     if (isLive) {
+      if (contest.auth_required === false) {
+        window.location.href = `/contest/guest/${contest.id}`;
+        return;
+      }
       // If contest is live, redirect to contest page
       window.location.href = `/contest/${contest.id}`;
     } else if (isLoggedIn) {
@@ -145,7 +150,11 @@ const CombinedHero = ({
       onRegister(contest.id);
     } else {
       // If user is not logged in, redirect to auth page
-      navigate('/auth');
+      if (contest.auth_required === false) {
+        window.location.href = `/contest/guest/${contest.id}`;
+      } else {
+        navigate('/auth');
+      }
     }
   };
 
@@ -177,7 +186,7 @@ const CombinedHero = ({
         <div className="absolute bottom-32 right-10 text-5xl animate-float-slow" style={{ animationDelay: '3s' }}>∞</div>
         <div className="absolute top-1/2 left-1/3 text-3xl animate-float-slow" style={{ animationDelay: '4s' }}>√</div>
         <div className="absolute top-1/3 right-1/3 text-4xl animate-float-slow" style={{ animationDelay: '5s' }}>∂</div>
-        
+
         {/* Additional Math Symbols */}
         <div className="absolute top-16 left-1/4 text-5xl animate-float-slow" style={{ animationDelay: '6s' }}>∑</div>
         <div className="absolute top-40 right-1/4 text-4xl animate-float-slow" style={{ animationDelay: '7s' }}>∫</div>
@@ -186,10 +195,10 @@ const CombinedHero = ({
         <div className="absolute top-1/4 right-16 text-3xl animate-float-slow" style={{ animationDelay: '10s' }}>√</div>
         <div className="absolute top-3/4 left-16 text-4xl animate-float-slow" style={{ animationDelay: '11s' }}>∂</div>
       </div>
-      
+
       {/* Dark Center Element */}
       <div className="absolute inset-0 bg-gradient-radial from-transparent via-[#191D2A]/40 to-[#191D2A]/80"></div>
-      
+
       {/* Floating Dark Elements */}
       <div className="absolute top-1/4 left-1/4 w-32 h-32 bg-[#191D2A]/30 rounded-full blur-xl animate-float"></div>
       <div className="absolute bottom-1/4 right-1/4 w-40 h-40 bg-[#191D2A]/40 rounded-full blur-xl animate-float" style={{ animationDelay: '2s' }}></div>
@@ -197,16 +206,16 @@ const CombinedHero = ({
 
       <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8 h-full items-start lg:items-center">
-          
+
           {/* Left Column - Hero Section */}
-          <motion.div 
+          <motion.div
             className="md:col-span-2 lg:col-span-1 text-center lg:text-left mb-8 lg:mb-0"
             initial={{ opacity: 0, x: -50 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.8 }}
           >
             {/* Main Headline */}
-            <motion.h1 
+            <motion.h1
               className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold mb-4"
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
@@ -224,28 +233,28 @@ const CombinedHero = ({
                 Win.
               </span>
             </motion.h1>
-            
+
             {/* Subtext Tagline */}
-            <motion.p 
+            <motion.p
               className="text-base sm:text-lg md:text-xl mb-6 text-white/90 font-medium leading-relaxed px-4 sm:px-0"
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 1, delay: 0.4 }}
             >
-              {isLoggedIn 
+              {isLoggedIn
                 ? `Welcome back! Ready to tackle today's math challenges?`
                 : 'Join the ultimate math contest platform where students compete, learn, and excel.'
               }
             </motion.p>
-            
+
             {/* CTA Button */}
-            <motion.div 
+            <motion.div
               className="flex justify-center lg:justify-start px-4 sm:px-0"
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 1, delay: 0.6 }}
             >
-              <button 
+              <button
                 onClick={() => navigate(isLoggedIn ? '/dashboard' : '/auth')}
                 className="w-full sm:w-auto bg-gradient-to-r from-[#49E3FF] to-[#A146D4] text-[#191D2A] px-6 sm:px-8 py-3 rounded-lg font-semibold hover:shadow-lg hover:shadow-[#49E3FF]/25 transition-all duration-300 hover:scale-105 transform focus:outline-none focus:ring-2 focus:ring-[#49E3FF] focus:ring-offset-2 focus:ring-offset-[#191D2A]"
               >
@@ -255,7 +264,7 @@ const CombinedHero = ({
           </motion.div>
 
           {/* Center Column - Featured Contest */}
-          <motion.div 
+          <motion.div
             id="upcoming-contest"
             className="md:col-span-1 lg:col-span-1 h-[28rem] sm:h-[32rem] mb-6 lg:mb-0"
             initial={{ opacity: 0, y: 50 }}
@@ -310,8 +319,8 @@ const CombinedHero = ({
                       </p>
                       <div className="flex justify-center space-x-1 sm:space-x-2">
                         {Object.entries(timeLeft).map(([unit, value]) => (
-                          <motion.div 
-                            key={unit} 
+                          <motion.div
+                            key={unit}
                             className="text-center"
                             initial={{ scale: 0.8, opacity: 0 }}
                             animate={{ scale: 1, opacity: 1 }}
@@ -336,8 +345,8 @@ const CombinedHero = ({
                       </p>
                       <div className="flex justify-center space-x-1 sm:space-x-2">
                         {Object.entries(timeUntilEnd).map(([unit, value]) => (
-                          <motion.div 
-                            key={unit} 
+                          <motion.div
+                            key={unit}
                             className="text-center"
                             initial={{ scale: 0.8, opacity: 0 }}
                             animate={{ scale: 1, opacity: 1 }}
@@ -373,11 +382,10 @@ const CombinedHero = ({
                   <div className="text-center mt-auto pt-4 pb-2">
                     <button
                       onClick={handleButtonClick}
-                      className={`w-full px-4 sm:px-6 py-2 rounded-lg font-semibold text-xs sm:text-sm transition-all duration-300 hover:scale-105 transform focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-[#191D2A] ${
-                        isLive 
-                          ? 'bg-gradient-to-r from-[#49E3FF] to-[#A146D4] text-[#191D2A] hover:shadow-lg hover:shadow-[#49E3FF]/25 focus:ring-[#49E3FF]' 
-                          : 'bg-gradient-to-r from-[#A146D4] to-[#49E3FF] text-white hover:shadow-lg hover:shadow-[#A146D4]/25 focus:ring-[#A146D4]'
-                      }`}
+                      className={`w-full px-4 sm:px-6 py-2 rounded-lg font-semibold text-xs sm:text-sm transition-all duration-300 hover:scale-105 transform focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-[#191D2A] ${isLive
+                        ? 'bg-gradient-to-r from-[#49E3FF] to-[#A146D4] text-[#191D2A] hover:shadow-lg hover:shadow-[#49E3FF]/25 focus:ring-[#49E3FF]'
+                        : 'bg-gradient-to-r from-[#A146D4] to-[#49E3FF] text-white hover:shadow-lg hover:shadow-[#A146D4]/25 focus:ring-[#A146D4]'
+                        }`}
                     >
                       {getButtonText()}
                     </button>
@@ -402,7 +410,7 @@ const CombinedHero = ({
           </motion.div>
 
           {/* Right Column - Leaderboard Preview */}
-          <motion.div 
+          <motion.div
             id="leaderboard-section"
             className="md:col-span-2 lg:col-span-1 h-[28rem] sm:h-[32rem]"
             initial={{ opacity: 0, x: 50 }}

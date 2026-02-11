@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Client, Databases } from 'appwrite';
+import { supabase } from '../../config/supabaseClient';
 import { motion } from 'motion/react';
 import { User, Mail, Phone, ChevronRight, AlertCircle, Loader2 } from 'lucide-react';
 import { appwriteEndpoint, appwriteProjectId, appwriteDatabaseId } from '../../../config';
@@ -19,11 +20,19 @@ export default function GuestStartPage() {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [contest, setContest] = useState(null);
+
+    // Fixed: Initialize all fields
     const [formData, setFormData] = useState({
         name: '',
         email: '',
         phone: '',
+        div: '',
+        roll: '',
+        prn: ''
     });
+
+    const [validationErrors, setValidationErrors] = useState({});
+    const [isChecking, setIsChecking] = useState(false);
 
     // 1. Fetch contest details on mount
     useEffect(() => {
@@ -55,45 +64,82 @@ export default function GuestStartPage() {
         if (contestId) fetchContest();
     }, [contestId]);
 
-    const [validationErrors, setValidationErrors] = useState({});
 
     const validateForm = () => {
         const errors = {};
         if (!formData.name.trim()) errors.name = "Name is required";
+
         if (!formData.email.trim()) {
             errors.email = "Email is required";
         } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
             errors.email = "Email is invalid";
         }
 
+        // Fixed: Phone number validation
         if (!formData.phone.trim()) {
             errors.phone = "Phone number is required";
         } else if (!/^\d{10}$/.test(formData.phone.replace(/\D/g, ''))) {
             errors.phone = "Phone number must be 10 digits";
         }
 
+        // Fixed: Added back validation for new fields
+        if (!formData.div.trim()) errors.div = "Div is required";
+        if (!formData.roll.trim()) errors.roll = "Roll No is required";
+        if (!formData.prn.trim()) errors.prn = "PRN is required";
+
         setValidationErrors(errors);
         return Object.keys(errors).length === 0;
     };
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
 
         if (!validateForm()) return;
 
-        // Save guest details to local storage and navigate to test environment
-        // using a unique key composition
-        const sessionKey = `guest_session_${contestId}`;
-        const sessionData = {
-            ...formData,
-            contestId,
-            startTime: new Date().toISOString()
-        };
+        setIsChecking(true);
+        setError(null);
 
-        localStorage.setItem(sessionKey, JSON.stringify(sessionData));
+        try {
+            // Check for existing submission
+            const { data, error: sbError } = await supabase
+                .from('guest_submissions')
+                .select('id')
+                .eq('contest_id', contestId)
+                .eq('guest_email', formData.email)
+                .single();
 
-        // Navigate to the actual test page
-        navigate(`/contest/guest/${contestId}/attempt`);
+            // Ignore "Row not found" error (PGRST116) as that's what we want
+            if (sbError && sbError.code !== 'PGRST116') {
+                console.error("Supabase check error:", sbError);
+                setError("Failed to verify submission status. Please try again.");
+                setIsChecking(false);
+                return;
+            }
+
+            if (data) {
+                setError("You have already submitted a response for this contest.");
+                setIsChecking(false);
+                return;
+            }
+
+            // Save guest details to local storage and navigate to test environment
+            const sessionKey = `guest_session_${contestId}`;
+            const sessionData = {
+                ...formData,
+                contestId,
+                startTime: new Date().toISOString()
+            };
+
+            localStorage.setItem(sessionKey, JSON.stringify(sessionData));
+
+            // Navigate to the actual test page
+            navigate(`/contest/guest/${contestId}/attempt`);
+
+        } catch (err) {
+            console.error("Submission check error:", err);
+            setError("An unexpected error occurred.");
+            setIsChecking(false);
+        }
     };
 
     if (loading) {
@@ -247,10 +293,20 @@ export default function GuestStartPage() {
                         <div className="pt-4">
                             <button
                                 type="submit"
-                                className="w-full bg-gradient-to-r from-[#A146D4] to-[#49E3FF] text-white font-bold py-3 rounded-lg hover:opacity-90 transition-opacity flex items-center justify-center group"
+                                disabled={isChecking}
+                                className="w-full bg-gradient-to-r from-[#A146D4] to-[#49E3FF] text-white font-bold py-3 rounded-lg hover:opacity-90 transition-opacity flex items-center justify-center group disabled:opacity-50 disabled:cursor-not-allowed"
                             >
-                                Start Contest
-                                <ChevronRight className="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform" />
+                                {isChecking ? (
+                                    <>
+                                        <Loader2 className="w-5 h-5 mr-2 animate-spin" />
+                                        Checking...
+                                    </>
+                                ) : (
+                                    <>
+                                        Start Contest
+                                        <ChevronRight className="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform" />
+                                    </>
+                                )}
                             </button>
                             <p className="text-xs text-center text-[#64748B] mt-4">
                                 By starting, you agree to our anti-cheating policy.

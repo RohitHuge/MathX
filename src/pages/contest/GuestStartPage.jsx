@@ -66,7 +66,9 @@ export default function GuestStartPage() {
             errors.email = "Email is invalid";
         }
 
-        if (formData.phone && !/^\d{10}$/.test(formData.phone.replace(/\D/g, ''))) {
+        if (!formData.phone.trim()) {
+            errors.phone = "Phone number is required";
+        } else if (!/^\d{10}$/.test(formData.phone.replace(/\D/g, ''))) {
             errors.phone = "Phone number must be 10 digits";
         }
 
@@ -225,7 +227,7 @@ export default function GuestStartPage() {
                         </div>
 
                         <div>
-                            <label className="block text-sm font-medium text-[#94A3B8] mb-1">Phone Number (Optional)</label>
+                            <label className="block text-sm font-medium text-[#94A3B8] mb-1">Phone Number *</label>
                             <div className="relative">
                                 <Phone className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#64748B]" />
                                 <input

@@ -55,9 +55,29 @@ export default function GuestStartPage() {
         if (contestId) fetchContest();
     }, [contestId]);
 
+    const [validationErrors, setValidationErrors] = useState({});
+
+    const validateForm = () => {
+        const errors = {};
+        if (!formData.name.trim()) errors.name = "Name is required";
+        if (!formData.email.trim()) {
+            errors.email = "Email is required";
+        } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
+            errors.email = "Email is invalid";
+        }
+
+        if (formData.phone && !/^\d{10}$/.test(formData.phone.replace(/\D/g, ''))) {
+            errors.phone = "Phone number must be 10 digits";
+        }
+
+        setValidationErrors(errors);
+        return Object.keys(errors).length === 0;
+    };
+
     const handleSubmit = (e) => {
         e.preventDefault();
-        if (!formData.name || !formData.email) return;
+
+        if (!validateForm()) return;
 
         // Save guest details to local storage and navigate to test environment
         // using a unique key composition
@@ -128,13 +148,16 @@ export default function GuestStartPage() {
                                 <User className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#64748B]" />
                                 <input
                                     type="text"
-                                    required
-                                    className="w-full bg-[#0F172A] border border-[#334155] rounded-lg py-2.5 pl-10 pr-4 text-white focus:outline-none focus:border-[#49E3FF] transition-colors"
+                                    className={`w-full bg-[#0F172A] border rounded-lg py-2.5 pl-10 pr-4 text-white focus:outline-none focus:border-[#49E3FF] transition-colors ${validationErrors.name ? 'border-red-500' : 'border-[#334155]'}`}
                                     placeholder="Enter your name"
                                     value={formData.name}
-                                    onChange={e => setFormData({ ...formData, name: e.target.value })}
+                                    onChange={e => {
+                                        setFormData({ ...formData, name: e.target.value });
+                                        if (validationErrors.name) setValidationErrors({ ...validationErrors, name: null });
+                                    }}
                                 />
                             </div>
+                            {validationErrors.name && <p className="text-red-500 text-xs mt-1">{validationErrors.name}</p>}
                         </div>
 
                         <div>
@@ -143,13 +166,16 @@ export default function GuestStartPage() {
                                 <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#64748B]" />
                                 <input
                                     type="email"
-                                    required
-                                    className="w-full bg-[#0F172A] border border-[#334155] rounded-lg py-2.5 pl-10 pr-4 text-white focus:outline-none focus:border-[#49E3FF] transition-colors"
+                                    className={`w-full bg-[#0F172A] border rounded-lg py-2.5 pl-10 pr-4 text-white focus:outline-none focus:border-[#49E3FF] transition-colors ${validationErrors.email ? 'border-red-500' : 'border-[#334155]'}`}
                                     placeholder="Enter your email"
                                     value={formData.email}
-                                    onChange={e => setFormData({ ...formData, email: e.target.value })}
+                                    onChange={e => {
+                                        setFormData({ ...formData, email: e.target.value });
+                                        if (validationErrors.email) setValidationErrors({ ...validationErrors, email: null });
+                                    }}
                                 />
                             </div>
+                            {validationErrors.email && <p className="text-red-500 text-xs mt-1">{validationErrors.email}</p>}
                         </div>
 
                         <div>
@@ -158,12 +184,16 @@ export default function GuestStartPage() {
                                 <Phone className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#64748B]" />
                                 <input
                                     type="tel"
-                                    className="w-full bg-[#0F172A] border border-[#334155] rounded-lg py-2.5 pl-10 pr-4 text-white focus:outline-none focus:border-[#49E3FF] transition-colors"
+                                    className={`w-full bg-[#0F172A] border rounded-lg py-2.5 pl-10 pr-4 text-white focus:outline-none focus:border-[#49E3FF] transition-colors ${validationErrors.phone ? 'border-red-500' : 'border-[#334155]'}`}
                                     placeholder="Enter your phone"
                                     value={formData.phone}
-                                    onChange={e => setFormData({ ...formData, phone: e.target.value })}
+                                    onChange={e => {
+                                        setFormData({ ...formData, phone: e.target.value });
+                                        if (validationErrors.phone) setValidationErrors({ ...validationErrors, phone: null });
+                                    }}
                                 />
                             </div>
+                            {validationErrors.phone && <p className="text-red-500 text-xs mt-1">{validationErrors.phone}</p>}
                         </div>
 
                         <div className="pt-4">

@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef, useMemo } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Client, Databases, Query } from 'appwrite';
 import { supabase } from '../../config/supabaseClient';
@@ -18,6 +18,7 @@ import {
 } from 'lucide-react';
 import { appwriteEndpoint, appwriteProjectId, appwriteDatabaseId } from '../../../config';
 import GuestContestLayout from '../../layouts/GuestContestLayout';
+import { useFullScreenEnforcement } from '../../hooks/useFullScreenEnforcement';
 
 // Appwrite init
 const client = new Client()
@@ -76,6 +77,24 @@ export default function GuestContestPage() {
     const timerRef = useRef(null);
     const autoSubmitRef = useRef(false);
 
+    const handleAutoSubmit = () => {
+        if (autoSubmitRef.current || isSubmitted) return;
+        autoSubmitRef.current = true;
+        handleSubmit();
+    };
+
+    // Anti-Cheat Hook
+    const {
+        enterFullScreen,
+        showWarningModal,
+        reEnterFullScreen,
+        remainingWarnings
+    } = useFullScreenEnforcement(
+        !loading && !isSubmitted, // isTesting
+        () => handleAutoSubmit(), // onSubmit (on violation limit)
+        2 // maxWarnings
+    );
+
     // 1. Init & Fetch
     useEffect(() => {
         const init = async () => {
@@ -102,8 +121,6 @@ export default function GuestContestPage() {
                 setContest(contestDoc);
 
                 // Fetch Questions
-                // Note: guests might need a proxy if read permissions are strict.
-                // Assuming 'role:any' or 'role:guest' read permissions on 'questions' collection for logic simplicity here.
                 const qDocs = await databases.listDocuments(
                     appwriteDatabaseId,
                     'questions',
@@ -117,13 +134,8 @@ export default function GuestContestPage() {
 
                 setQuestions(qDocs.documents);
 
-                // Calculate Time Details
-                // Check if contest is fixed time or flexible duration
-                // For guest mode, we usually respect the "contestDuration" from the moment they start
-                // OR a specific fixed window. Assuming 'duration' logic here.
+                // Check duration
                 const durationMins = parseInt(contestDoc.contestDuration) || 60;
-
-                // Calculate elapsed time since they "started" (clicked start on prev page)
                 const startTime = new Date(session.startTime).getTime();
                 const now = Date.now();
                 const elapsedSec = Math.floor((now - startTime) / 1000);
@@ -133,7 +145,6 @@ export default function GuestContestPage() {
                 setTimeLeft(remaining);
 
                 if (remaining <= 0) {
-                    // Already expired?
                     alert("Session expired.");
                     navigate(`/contest/guest/${contestId}/login`);
                     return;
@@ -167,7 +178,7 @@ export default function GuestContestPage() {
         return () => clearInterval(timerRef.current);
     }, [loading, isSubmitted]);
 
-    // 3. Anti-Cheat Listeners
+    // 3. Additional Anti-Cheat Listeners (Telemetry)
     useEffect(() => {
         if (loading || isSubmitted) return;
 
@@ -177,7 +188,6 @@ export default function GuestContestPage() {
                     ...prev,
                     flags: { ...prev.flags, tab_switches: prev.flags.tab_switches + 1 }
                 }));
-                // Optional: Auto-submit on too many violations
             }
         };
 
@@ -216,12 +226,6 @@ export default function GuestContestPage() {
         if (currentInfo.idx > 0) {
             setCurrentInfo(prev => ({ ...prev, idx: prev.idx - 1 }));
         }
-    };
-
-    const handleAutoSubmit = () => {
-        if (autoSubmitRef.current || isSubmitted) return;
-        autoSubmitRef.current = true;
-        handleSubmit();
     };
 
     const handleSubmit = async () => {
@@ -283,6 +287,18 @@ export default function GuestContestPage() {
         </GuestContestLayout>
     );
 
+    if (error) {
+        return (
+            <GuestContestLayout>
+                <div className="flex flex-col items-center justify-center pt-20 text-center px-4">
+                    <AlertTriangle className="w-16 h-16 text-yellow-500 mb-4" />
+                    <h2 className="text-2xl font-bold text-white mb-2">Error</h2>
+                    <p className="text-[#94A3B8]">{error}</p>
+                </div>
+            </GuestContestLayout>
+        );
+    }
+
     if (isSubmitted) {
         return (
             <GuestContestLayout>
@@ -318,7 +334,6 @@ export default function GuestContestPage() {
 
     const currentQ = questions[currentInfo.idx];
     const totalQ = questions.length;
-    const isAnswered = currentInfo.answers[currentQ.$id] !== undefined;
 
     return (
         <GuestContestLayout>
@@ -475,6 +490,38 @@ export default function GuestContestPage() {
 
                 </div>
             </div>
+
+            {/* Warning Modal */}
+            <AnimatePresence>
+                {showWarningModal && (
+                    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4">
+                        <motion.div
+                            initial={{ scale: 0.9, opacity: 0 }}
+                            animate={{ scale: 1, opacity: 1 }}
+                            exit={{ scale: 0.9, opacity: 0 }}
+                            className="bg-[#1E293B] border border-red-500 rounded-xl p-6 max-w-md w-full text-center shadow-2xl"
+                        >
+                            <AlertTriangle className="w-16 h-16 text-red-500 mx-auto mb-4" />
+                            <h2 className="text-2xl font-bold text-white mb-2">Warning: Fullscreen Exited</h2>
+                            <p className="text-[#94A3B8] mb-6">
+                                You have exited fullscreen mode. This is recorded as a violation.
+                                <br />
+                                <span className="text-red-400 font-bold">
+                                    {remainingWarnings > 0
+                                        ? `${remainingWarnings} warning(s) remaining before auto-submission.`
+                                        : "Next violation will submit your test."}
+                                </span>
+                            </p>
+                            <button
+                                onClick={reEnterFullScreen}
+                                className="w-full bg-red-600 hover:bg-red-700 text-white font-bold py-3 rounded-lg transition"
+                            >
+                                Return to Fullscreen
+                            </button>
+                        </motion.div>
+                    </div>
+                )}
+            </AnimatePresence>
         </GuestContestLayout>
     );
 }

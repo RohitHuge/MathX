@@ -138,7 +138,7 @@ const Step1Members = ({ formData, setFormData, onNext }) => {
                                     value={localMember.name}
                                     onChange={handleChange}
                                     className={`w-full bg-[#0F1419] border ${errors.name ? 'border-red-500' : 'border-gray-700'} rounded-xl py-3 pl-10 pr-4 text-white focus:outline-none focus:border-[#A146D4] transition-colors`}
-                                    placeholder="John Doe"
+                                    placeholder="Enter Full Name"
                                 />
                             </div>
                             {errors.name && <p className="text-red-400 text-xs mt-1">{errors.name}</p>}
@@ -155,7 +155,7 @@ const Step1Members = ({ formData, setFormData, onNext }) => {
                                     value={localMember.email}
                                     onChange={handleChange}
                                     className={`w-full bg-[#0F1419] border ${errors.email ? 'border-red-500' : 'border-gray-700'} rounded-xl py-3 pl-10 pr-4 text-white focus:outline-none focus:border-[#A146D4] transition-colors`}
-                                    placeholder="john@example.com"
+                                    placeholder="Enter Email Address"
                                 />
                             </div>
                             {errors.email && <p className="text-red-400 text-xs mt-1">{errors.email}</p>}
@@ -173,7 +173,7 @@ const Step1Members = ({ formData, setFormData, onNext }) => {
                                     onChange={handleChange}
                                     maxLength={10}
                                     className={`w-full bg-[#0F1419] border ${errors.phone ? 'border-red-500' : 'border-gray-700'} rounded-xl py-3 pl-10 pr-4 text-white focus:outline-none focus:border-[#A146D4] transition-colors`}
-                                    placeholder="9876543210"
+                                    placeholder="Enter Phone Number"
                                 />
                             </div>
                             {errors.phone && <p className="text-red-400 text-xs mt-1">{errors.phone}</p>}
@@ -203,7 +203,7 @@ const Step1Members = ({ formData, setFormData, onNext }) => {
                                     value={localMember.college}
                                     onChange={handleChange}
                                     className={`w-full bg-[#0F1419] border ${errors.college ? 'border-red-500' : 'border-gray-700'} rounded-xl py-3 pl-10 pr-4 text-white focus:outline-none focus:border-[#A146D4] transition-colors`}
-                                    placeholder="XYZ College of Engineering"
+                                    placeholder="Enter College Name"
                                 />
                             </div>
                             {errors.college && <p className="text-red-400 text-xs mt-1">{errors.college}</p>}

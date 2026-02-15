@@ -113,9 +113,9 @@ const RegistrationContent = () => {
                 <div className="absolute bottom-0 right-1/4 w-80 h-80 bg-blue-600/10 rounded-full blur-[90px]" />
             </div>
 
-            <div className="relative z-10 max-w-5xl mx-auto px-4 py-8">
+            <div className="relative text-lg z-10 max-w-5xl mx-auto px-4 py-8">
                 {/* Header */}
-                <header className="text-center mb-10">
+                <header className="text-center mb-10 ">
                     <motion.h1
                         initial={{ opacity: 0, y: -20 }}
                         animate={{ opacity: 1, y: 0 }}

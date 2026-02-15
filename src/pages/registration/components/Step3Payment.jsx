@@ -11,8 +11,8 @@ const Step3Payment = ({ formData, setFormData, onNext, onBack, isSubmitting }) =
     const toast = useToast();
 
     // Constants
-    const UPI_ID = "mathx-club@upi";
-    const AMOUNT = "₹150";
+    const UPI_ID = "krushnapawar2210-1@okhdfcbank";
+    const AMOUNT = "₹300";
 
     const handleCopyUPI = () => {
         navigator.clipboard.writeText(UPI_ID);
@@ -111,10 +111,11 @@ const Step3Payment = ({ formData, setFormData, onNext, onBack, isSubmitting }) =
                 {/* QR Code Placeholder */}
                 <div className="bg-white p-4 rounded-xl mb-6 shadow-inner">
                     {/* Replace this with actual QR Image later using <img src="..." /> */}
-                    <div className="w-48 h-48 bg-gray-200 rounded-lg flex items-center justify-center border-2 border-dashed border-gray-400">
+                    {/* <div className="w-48 h-48 bg-gray-200 rounded-lg flex items-center justify-center border-2 border-dashed border-gray-400">
                         <QrCode className="w-16 h-16 text-gray-500" />
                         <span className="sr-only">QR Code</span>
-                    </div>
+                    </div> */}
+                    <img src="./qr.png" />
                 </div>
 
                 <div className="w-full space-y-4">

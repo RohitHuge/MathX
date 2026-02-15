@@ -111,6 +111,30 @@ export const submitRegistration = async (formData) => {
 
         if (paymentError) throw new Error(`Failed to record payment: ${paymentError.message}`);
 
+        // 5. Send Confirmation Email via Edge Function
+        try {
+            const emailFunctionUrl = import.meta.env.VITE_EMAIL_FUNCTION_URL;
+            if (emailFunctionUrl) {
+                await fetch(emailFunctionUrl, {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({
+                        leaderEmail: members[leaderIndex].email,
+                        teamName: teamName,
+                        teamId: refId, // Using refId as the user-facing Team ID
+                        members: members.map(m => ({ full_name: m.name, email: m.email }))
+                    })
+                });
+            } else {
+                console.warn("VITE_EMAIL_FUNCTION_URL is not set. Skipping email.");
+            }
+        } catch (emailError) {
+            console.error("Failed to send confirmation email:", emailError);
+            // We do NOT suppress the success of the registration if email fails
+        }
+
         return { success: true, teamId, refId: refId };
 
     } catch (error) {

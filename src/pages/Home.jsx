@@ -568,23 +568,23 @@ function UpcomingEvents() {
       highlight: "Get Certificate Instantly",
       status: "ongoing"
     },
-    {
-      id: 2,
-      title: "Maths Premier League",
-      date: "upcoming",
-      time: "TBA",
-      description: "A fun auction of brilliant minds in mathematics. Competiting with each other to win the title of Maths Premier League.",
-      highlight: "🏆 Maths Premier League",
-      status: "upcoming"
-    },
+    // {
+    //   id: 2,
+    //   title: "Maths Premier League",
+    //   date: "upcoming",
+    //   time: "TBA",
+    //   description: "A fun auction of brilliant minds in mathematics. Competiting with each other to win the title of Maths Premier League.",
+    //   highlight: "🏆 Maths Premier League",
+    //   status: "upcoming"
+    // },
     {
       id: 3,
       title: "National Level Quiz",
-      date: "Coming Soon",
+      date: "14th March 2026",
       time: "TBA",
       description: "A prestigious national-level mathematics competition bringing together the best minds from across the country.",
       highlight: "🏆 National Competition",
-      status: "planned"
+      status: "Registration Open"
     }
   ];
 
@@ -600,7 +600,7 @@ function UpcomingEvents() {
           Upcoming Events
         </h2>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-8">
           {events.map((event, index) => (
             <div key={event.id} className="group relative p-6 border border-[#A146D4]/30 rounded-xl bg-[#191D2A] hover:border-[#49E3FF] transition-all duration-500 hover:shadow-lg hover:shadow-[#49E3FF]/20 hover:scale-105 transform animate-on-scroll" data-delay={index * 200}>
               <div className="absolute top-4 right-4">
@@ -614,9 +614,9 @@ function UpcomingEvents() {
                     Ongoing
                   </span>
                 )}
-                {event.status === 'planned' && (
+                {event.status === 'Registration Open' && (
                   <span className="bg-[#0067A1] text-white px-2 py-1 rounded-full text-xs font-semibold">
-                    Planned
+                    Registration Open
                   </span>
                 )}
               </div>

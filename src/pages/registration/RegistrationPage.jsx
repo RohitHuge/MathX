@@ -11,7 +11,7 @@ import { useToast } from './context/ToastContext';
 import Loader from './components/ui/Loader';
 
 const RegistrationContent = () => {
-    const [currentStep, setCurrentStep] = useState(1);
+    const [currentStep, setCurrentStep] = useState(4);
     const [formData, setFormData] = useState({
         members: [
             { name: '', email: '', phone: '', college: '' },

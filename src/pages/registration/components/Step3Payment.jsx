@@ -1,12 +1,13 @@
 import React, { useState, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { QrCode, Upload, Check, Copy, AlertCircle, Trash2, ArrowRight, ArrowLeft } from 'lucide-react';
+import { QrCode, Upload, Check, Copy, AlertCircle, Trash2, ArrowRight, ArrowLeft, FileText } from 'lucide-react';
 import { useToast } from '../context/ToastContext';
 import Loader from './ui/Loader';
 
 const Step3Payment = ({ formData, setFormData, onNext, onBack, isSubmitting }) => {
     const [isDragging, setIsDragging] = useState(false);
     const [uploading, setUploading] = useState(false);
+    const [isRuleBookRead, setIsRuleBookRead] = useState(false);
     const fileInputRef = useRef(null);
     const toast = useToast();
 
@@ -94,6 +95,12 @@ const Step3Payment = ({ formData, setFormData, onNext, onBack, isSubmitting }) =
                 return;
             }
         }
+
+        if (!isRuleBookRead) {
+            toast.error('Please read and accept the rule book');
+            return;
+        }
+
         onNext();
     };
 
@@ -228,6 +235,30 @@ const Step3Payment = ({ formData, setFormData, onNext, onBack, isSubmitting }) =
                             placeholder="Enter UTR / Ref No."
                         />
                     </div>
+
+                    {/* Rule Book & Agreement */}
+                    <div className="mt-6 p-4 bg-[#0F1419] rounded-xl border border-gray-700 flex flex-col gap-3">
+                        <a
+                            href="https://drive.google.com/file/d/18sW5kBVV_tLCaNOoZpe7DDAZSujR1qhm/view?usp=sharing"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="flex items-center gap-2 text-[#49E3FF] hover:text-[#A146D4] transition-colors text-sm font-medium"
+                        >
+                            <FileText className="w-4 h-4" />
+                            Download & Read Rule Book
+                        </a>
+                        <label className="flex items-start gap-3 cursor-pointer group">
+                            <input
+                                type="checkbox"
+                                checked={isRuleBookRead}
+                                onChange={(e) => setIsRuleBookRead(e.target.checked)}
+                                className="mt-1 w-4 h-4 rounded bg-[#191D2A] border-gray-600 text-[#49E3FF] focus:ring-0 focus:ring-offset-0 cursor-pointer"
+                            />
+                            <span className="text-gray-400 text-sm group-hover:text-gray-300 transition-colors select-none">
+                                I have read and agree to the rules and regulations.
+                            </span>
+                        </label>
+                    </div>
                 </div>
 
                 {/* Navigation Buttons for this step */}
@@ -242,8 +273,8 @@ const Step3Payment = ({ formData, setFormData, onNext, onBack, isSubmitting }) =
 
                     <button
                         onClick={handleSubmit}
-                        disabled={isSubmitting}
-                        className={`px-8 py-3 bg-gradient-to-r from-[#A146D4] to-[#49E3FF] text-white font-bold rounded-xl flex items-center gap-2 transform transition-all ${isSubmitting ? 'opacity-70 cursor-not-allowed' : 'hover:shadow-[0_0_20px_rgba(73,227,255,0.4)] hover:scale-105'}`}
+                        disabled={isSubmitting || !isRuleBookRead}
+                        className={`px-8 py-3 bg-gradient-to-r from-[#A146D4] to-[#49E3FF] text-white font-bold rounded-xl flex items-center gap-2 transform transition-all ${isSubmitting || !isRuleBookRead ? 'opacity-70 cursor-not-allowed bg-gray-600 grayscale' : 'hover:shadow-[0_0_20px_rgba(73,227,255,0.4)] hover:scale-105'}`}
                     >
                         {isSubmitting ? 'Submitting...' : 'Submit Registration'}
                         {!isSubmitting && <ArrowRight className="w-5 h-5" />}

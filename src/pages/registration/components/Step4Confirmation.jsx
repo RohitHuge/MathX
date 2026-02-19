@@ -197,6 +197,8 @@ const Step4Confirmation = ({ formData }) => {
                             Download Confirmation
                         </button>
 
+
+
                         <div className="w-full sm:w-auto bg-green-500/10 border border-green-500/20 rounded-xl p-4 mt-2">
                             <p className="text-green-400 text-sm mb-3 font-medium">
                                 Join our WhatsApp group for further instructions and updates.

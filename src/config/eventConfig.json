@@ -1,13 +1,13 @@
 {
   "currentEvent": {
     "id": "mathx-contest-01",
-    "title": "MathX Contest ",
-    "description": "Join us for the first MathX Contest",
-    "startTime": "2025-10-09T12:00:00.000Z",
-    "endTime": "2025-10-10T00:00:00.000Z",
-    "duration": "12 hours",
-    "location": "Online Event",
-    "registrationUrl": "/registration",
+    "title": "National Level Quiz ",
+    "description": "Compete with best math minds across the nation",
+    "startTime": "2026-03-14T08:00:00.000Z",
+    "endTime": "2026-03-14T18:00:00.000Z",
+    "duration": "10 hours",
+    "location": "PCCOER Ravet, Campus",
+    "registrationUrl": "https://mathxpccoer.in/register",
     "isActive": true,
     "theme": {
       "primaryColor": "#A146D4",
@@ -19,7 +19,7 @@
         "type": "registration",
         "title": "Register Now",
         "description": "Secure yur spot to get a opportunity be a part",
-        "url": "/registration",
+        "url": "https://mathxpccoer.in/register",
         "color": "from-purple-500 to-indigo-500",
         "isRegistration": true
       },
@@ -41,7 +41,7 @@
         "type": "website",
         "title": "Visit MathX Website",
         "description": "Explore our full platform and resources",
-        "url": "https://mathxpccoer.pages.dev",
+        "url": "https://mathxpccoer.in",
         "color": "from-blue-500 to-cyan-400"
       }
     ]
